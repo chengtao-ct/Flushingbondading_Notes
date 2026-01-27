@@ -1,24 +1,28 @@
-# 📜 STM32F407 RTOS 工业架构白皮书 (Industrial Architecture Whitepaper)
-
-**Version**: v1.0.0
-**Status**: Archived
-**Hardware**: STM32F407 (Cortex-M4F)
-
+---
+created: 2026-01-27 22:14
+updated: 2026-01-27 22:14
+tags:
+  - embedded
+  - RTOS
+chip: STM32
+module: None
+language: C
+status: 完成
+---
 
 **不想看这个文档，可以看这个人讲的视频[B站：熊大计算](https://www.bilibili.com/video/BV1ksNCzXEny?spm_id_from=333.788.videopod.sections&vd_source=603f3c284e76fbe772654083937e3fac)**
+# 📑 STM32-RTOS的接入问题
 
-
-## 1. 执行摘要 (Executive Summary)
-
-本白皮书旨在解决 STM32F407 裸机开发向 RTOS 内核开发转型过程中的关键架构冲突。通过一系列红队测试与代码实战，我们确立了以下核心工程原则：
-
+> [!abstract] 学习目标
+> 本次学习主要为了理解什么概念？解决什么疑惑？
+> 主要处理了stm32是如何接入RTOS系统的和他和RTOS系统是如何相互操作的
+> 
 1.  **总线物理隔离原则**：利用 F407 特有的 **CCM RAM (64KB)** 存放 RTOS 任务栈，实现 CPU 密集型计算与 DMA 数据搬运的**物理并发**，彻底规避总线竞争。
 2.  **双堆栈安全模型**：严格区分 **MSP (特权级/中断)** 与 **PSP (用户级/任务)**。MSP 作为系统最后的“逃生舱”，确保即使任务栈溢出，紧急硬件中断仍能响应。
 3.  **中断特权分级**：确立了以 `configMAX_SYSCALL_INTERRUPT_PRIORITY` 为界的“生死红线”。高优先级中断（0-4）拥有绝对抢占权但禁止调用内核 API，低优先级中断（5-15）受内核托管。
 4.  **原子性与移植性**：虽然 STM32F4 具备 32 位读写原子性，但为了兼容性与 64 位 Tick 扩展，必须采用**临界区锁**机制。
 
----
-
+## 📊 图表与架构分析 (Diagrams)
 ## 2. 核心架构可视化 (Architectural Visualization)
 
 ### 图 2.1: F407 内存总线与 DMA 盲区 (Memory & Bus Matrix)
@@ -75,6 +79,7 @@ graph TD
 
 ### 图 2.2: RTOS 双堆栈切换时序 (The Dual-Stack Context Switch)
 展示了从“任务A”切换到“任务B”时，硬件与软件在 MSP/PSP 上的接力操作。
+
 ```mermaid
 graph TD
 
@@ -425,6 +430,13 @@ uint32_t* OS_StackInit(uint32_t *pxTopOfStack, void (*pxCode)(void *), void *pvP
 }
 
 ```
+
+
+## 💻 代码逻辑与实现 (C)
+
+---
+
+
 ## 4.2.2 Core 2: The Singularity (内核启动点)
 ### 物理目标：完成从 MSP (特权级) 到 PSP (用户级) 的跳跃。利用 SVC 异常来清洗 MSP 栈空间。
 
@@ -606,12 +618,6 @@ void SysTick_Handler(void)
 }
 
 ```
-# 📚 STM32F4 RTOS Knowledge Debt & Side-Quest Archive
-
-**Version**: v1.0.0
-**Context**: Embedded Systems Grandmaster Training (Phase 4.3)
-**Hardware**: STM32F407 (Cortex-M4F)
-
 ---
 
 ## 1. Terminology Map (黑话/术语校准)
@@ -685,14 +691,7 @@ void SysTick_Handler(void)
     *   **物理后果**: RTOS 的临界区保护手段（`BASEPRI`）对高优先级中断无效。你就像一个隐形人，在医生（RTOS）给病人做心脏手术（操作内核链表）时闯进手术室递剪刀。哪怕你的动作是对的，时机也是致命的。
 
 ---
-*End of Archive 4.3*
-
-# 🏭 STM32F4 RTOS Engineering Reality & Best Practice
-
-**Version**: v1.0.0
-**Context**: Industrial Hardening (Phase 4.4)
-**Target**: Mass Production (MP)
-
+*
 ---
 
 ## 1. ADR (Architecture Decision Records) - 架构决策复盘
@@ -763,15 +762,9 @@ void SysTick_Handler(void)
 **必须检查 EXC_RETURN (LR 的值)**：
 *   如果 `LR & 0x4 != 0`: 错误发生在线程模式 (PSP)。 -> 去读 PSP 指针。
 *   如果 `LR & 0x4 == 0`: 错误发生在中断模式 (MSP)。 -> 去读 MSP 指针。
-
 ---
-*End of Archive 4.4*
 
 # 🚀 Phase 5: Next-Day Trajectory (明日修炼导航)
-
-**Date**: 2026-01-15
-**Mentee Level**: Industrial Novice -> Kernel Initiate
-**Hardware**: STM32F407
 
 ---
 

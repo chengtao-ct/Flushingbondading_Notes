@@ -1,7 +1,20 @@
-# Phase 4: STM32 PID 闭环控制系统白皮书 (v1.0)
+---
+created: 2026-01-27 22:23
+updated: 2026-01-27 22:23
+tags:
+  - embedded
+  - bare-metal
+chip: STM32
+module: TIM，ISR
+language: C
+status: 完成
+---
 
-## 1. Executive Summary (核心摘要)
+# 📑 PID算法-闭环控制
 
+> [!abstract] 学习目标
+> 本次学习主要为了理解什么概念？解决什么疑惑？
+> PID算法的基础理解和操作
 本白皮书旨在构建一套工业级 STM32 直流电机闭环控制系统。系统基于 **离散 PID 控制理论**，解决了传统开环控制中无法应对负载变化和精度缺失的问题。
 
 ### 核心技术栈：
@@ -13,8 +26,9 @@
     *   引入 **Derivative on Measurement (微分先行)** 消除设定值突变带来的物理冲击。
     *   引入 **Feedforward (前馈控制)** 提升系统动态响应速度。
 
---
 
+
+## 📊 图表与架构分析 (Diagrams)
 ## 2. Visual Architecture & Roadmap (核心视觉资产库)
 
 以下是系统设计的 7 张核心逻辑图表（Mermaid 源码），涵盖硬件架构、底层时序、算法原理及调参流程。
@@ -258,13 +272,10 @@ graph TD
 
 ```
 
+## 💻 代码逻辑与实现 (C)
 
-# Phase 4: STM32 PID 闭环控制系统白皮书 (v1.0) - Source Code
-
-## Step 4.2: Full Source Code Artifacts (全量代码资产)
 
 本章节提供工业级 PID 控制器的完整 C 语言实现。该实现已集成 **Anti-Windup (抗积分饱和)**、**Derivative on Measurement (微分先行)** 及 **Feedforward (前馈控制)** 技术。
-
 ### Artifact 1: 控制器头文件 (`pid.h`)
 *定义控制对象结构体，封装数据以支持多电机控制。*
 
@@ -496,7 +507,6 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 ```
 
 
-# Phase 4: STM32 PID 闭环控制系统白皮书 (v1.0) - Knowledge Archive
 
 ## Step 4.3: Knowledge Debt & Side-Quest Archive (知识债务与支线库)
 
