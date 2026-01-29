@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "通信协议/SPI的基础理解.md",
+                "file": "操作系统与内核/STM32-RTOS的接入问题.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -28,7 +28,7 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "SPI的基础理解"
+              "title": "STM32-RTOS的接入问题"
             }
           }
         ]
@@ -63,7 +63,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "tag:embedded",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -123,12 +123,12 @@
             "state": {
               "type": "outgoing-link",
               "state": {
-                "file": "通信协议/SPI的基础理解.md",
+                "file": "操作系统与内核/STM32-RTOS的接入问题.md",
                 "linksCollapsed": false,
-                "unlinkedCollapsed": false
+                "unlinkedCollapsed": true
               },
               "icon": "links-going-out",
-              "title": "SPI的基础理解 的出链列表"
+              "title": "STM32-RTOS的接入问题 的出链列表"
             }
           },
           {
@@ -174,14 +174,33 @@
               "icon": "lucide-list",
               "title": "SPI的基础理解 的大纲"
             }
+          },
+          {
+            "id": "f70935aae7c326ca",
+            "type": "leaf",
+            "state": {
+              "type": "smart-connections-view",
+              "state": {},
+              "icon": "smart-connections",
+              "title": "Connections"
+            }
+          },
+          {
+            "id": "a01c168b820c20f5",
+            "type": "leaf",
+            "state": {
+              "type": "smart-lookup-view",
+              "state": {},
+              "icon": "smart-lookup",
+              "title": "Lookup"
+            }
           }
         ],
-        "currentTab": 1
+        "currentTab": 6
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -193,39 +212,43 @@
       "command-palette:打开命令面板": false,
       "bases:新建数据库": false,
       "markdown-importer:打开 Markdown 格式转换器": false,
-      "templater-obsidian:Templater": false
+      "templater-obsidian:Templater": false,
+      "smart-connections:Smart Connections: Open connections view": false,
+      "smart-connections:Smart Lookup: Open lookup view": false,
+      "smart-connections:Smart Connections: Open random connection": false
     }
   },
   "active": "6c4972cb9a74a78d",
   "lastOpenFiles": [
-    "通信协议/I2C的基础理解.md",
     "语言与算法/C(编译性语言)的编译过程.md",
-    "操作系统与内核/用户内存空间分配.md",
-    "_old_Notes/Notes/assets/操作系统学习/file-20260127202128168.png",
-    "操作系统与内核/IO映射.md",
-    "操作系统与内核/STM32-RTOS的接入问题.md",
-    "操作系统与内核/IPC.md",
-    "操作系统与内核/优先级问题.md",
-    "操作系统与内核/实时操作系统里对内存调用的处理.md",
-    "操作系统与内核/进程调度算法.md",
-    "操作系统与内核/多核并发的处理.md",
-    "操作系统与内核/互斥和同步.md",
-    "_old_Notes/Notes/操作系统学习.md",
-    "操作系统与内核/上下文切换.md",
-    "操作系统与内核/进程-线程-协程的理解.md",
-    "_old_Notes/Notes/C和CPP的大体.md",
-    "Template/嵌入式学习-DAILY.md",
-    "物理内存条 (DRAM).md",
     "语言与算法/函数/Malloc-Free函数.md",
-    "语言与算法/PID算法-闭环控制.md",
+    "硬件与芯片/FSMC（内存扩展）的实现.md",
+    "硬件与芯片/RCC时钟的基础理解和ISR的基础概念.md",
+    "硬件与芯片/STM32F407启动源码的理解.md",
+    "硬件与芯片/显示屏(大体).md",
+    "硬件与芯片/基础的电机驱动理解.md",
+    "操作系统与内核/STM32-RTOS的接入问题.md",
+    "操作系统与内核/优先级问题.md",
+    "操作系统与内核/IO映射.md",
+    "操作系统与内核/用户内存空间分配.md",
+    "操作系统与内核/进程-线程-协程的理解.md",
+    "操作系统与内核/锁.md",
+    "通信协议/SPI的基础理解.md",
+    "操作系统与内核/信号量.md",
+    "操作系统与内核/实时操作系统里对内存调用的处理.md",
+    "操作系统与内核/上下文切换.md",
+    "操作系统与内核/多核并发的处理.md",
+    "操作系统与内核/进程调度算法.md",
+    "操作系统与内核/互斥和同步.md",
+    "操作系统与内核/管程.md",
+    "操作系统与内核/IPC.md",
+    "硬件与芯片/DMA(直接存储器访问).md",
+    "通信协议/UART的基础理解.md",
+    "语言与算法/函数/Voliate函数.md",
+    "硬件与芯片/硬件内存的架构.md",
+    "_old_Notes/Notes/assets/操作系统学习/file-20260127202128168.png",
     "未命名",
     "语言与算法/函数",
-    "语言与算法/函数/Voliate函数.md",
-    "通信协议/通信协议总览.md",
-    "通信协议/UART的基础理解.md",
-    "通信协议/SPI的基础理解.md",
-    "硬件与芯片/STM32F407启动源码的理解.md",
-    "硬件与芯片/FSMC（内存扩展）的实现.md",
     "通信协议",
     "语言与算法",
     "操作系统与内核",

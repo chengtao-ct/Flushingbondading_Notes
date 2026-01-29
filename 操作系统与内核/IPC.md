@@ -25,48 +25,8 @@
 
  他只是举了个例子：ctrl^c 如何进行信号通信的
 
- 2. 信号量
+ 2. [[信号量]]
 
-原理： 一个全局的计数器。（本质也是一种信息）
-
-例子： P操作 (-1) 和 V操作 (+1)。
-
-特点： 主要用于同步（协调顺序）和互斥（抢锁），本身不传输数据内容
-
-接口：
-
-
-创建信号量： int semget(key_t key, int nsems, int semflag)
-
-        -创建成功返回信号量标识符，失败返回-1
-
-        -key：进程pid。
-
-        -nsems：创建信号量的个数。
-
-        -semflag：指定信号量读写权限
-
-改变信号量值：int semop(int semid, struct sembuf *sops, unsigned nsops);
-
-        -成功返回信号量标识符，失败返回-1。
-
-        -semid：信号量集标识符，由semget()函数返回。
-
-        -sops：指向struct sembuf结构的指针，先设置好sembuf值再通过指针传递。
-
-        -nsops：进行操作信号量的个数，即sops结构变量的个数，需大于或等于1。最常见设置此值等于1，只完成对一个信号量的操作
-
-直接控制信号量信息：int semctl(int semid, int semnum, int cmd, union semun arg);
-
-        -emid：信号量集标识符。
-
-        -semnum：信号量集数组上的下标，表示某一个信号量。
-
-        -arg：union semun类型。
-
-
-
-3. 数据传输管道(linux里面的 | 命令)
 
 **匿名管道 (Anonymous Pipe)**
 
@@ -188,7 +148,7 @@ Linux里面实现|的例子：
 Unix Domain Socket： 专门用于本机进程通信，比 TCP 快（不走网络协议栈），像 Docker、Nginx 都在用它。
 
 
-## 管道与管程的差别：
+## 管道与[[管程]]的差别：
 
 ![](../assest/{C41AA19C-F35C-48B9-BAD8-9CCCC35EBD69}.png)
 
