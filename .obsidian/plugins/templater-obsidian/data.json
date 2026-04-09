@@ -7,13 +7,21 @@
       ""
     ]
   ],
-  "trigger_on_file_creation": false,
+  "trigger_on_file_creation": true,
   "auto_jump_to_cursor": false,
   "enable_system_commands": false,
   "shell_path": "",
   "user_scripts_folder": "",
   "enable_folder_templates": true,
   "folder_templates": [
+    {
+      "folder": "Template",
+      "template": "Template/视频笔记.md"
+    },
+    {
+      "folder": "",
+      "template": "Template/FreeRtos-Study.md"
+    },
     {
       "folder": "",
       "template": ""
@@ -26,13 +34,11 @@
       "template": ""
     }
   ],
-  "syntax_highlighting": true,
+  "syntax_highlighting": false,
   "syntax_highlighting_mobile": false,
   "enabled_templates_hotkeys": [
     ""
   ],
-  "startup_templates": [
-    ""
-  ],
+  "startup_templates": [],
   "intellisense_render": 1
 }

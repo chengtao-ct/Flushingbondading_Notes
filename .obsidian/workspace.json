@@ -8,12 +8,12 @@
         "type": "tabs",
         "children": [
           {
-            "id": "6c4972cb9a74a78d",
+            "id": "c0ff44814815d377",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "操作系统与内核/STM32-RTOS的接入问题.md",
+                "file": "嵌入式/工程实践/CRC验证操作.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -28,10 +28,107 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "STM32-RTOS的接入问题"
+              "title": "CRC验证操作"
+            }
+          },
+          {
+            "id": "0d9d77fb793238e1",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "电气硬件-知识/电力电子/功率二极管.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "功率二极管"
+            }
+          },
+          {
+            "id": "69bdfc03b17126f7",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "工具/示波器·/1.示波器-概览.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "1.示波器-概览"
+            }
+          },
+          {
+            "id": "729cfac944157afe",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "电气硬件-知识/电路基础(Circuit Theory)/1. 电学量.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "1. 电学量"
+            }
+          },
+          {
+            "id": "e376afd487d3d5b6",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "工具/示波器·/5.触发系统.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "5.触发系统"
             }
           }
-        ]
+        ],
+        "currentTab": 4
       }
     ],
     "direction": "vertical"
@@ -63,7 +160,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "tag:embedded",
+                "query": "",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -88,7 +185,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 256.5
   },
   "right": {
     "id": "dd2d87647441e510",
@@ -104,7 +201,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "通信协议/SPI的基础理解.md",
+                "file": "优先级翻转.md",
                 "collapseAll": false,
                 "extraContext": true,
                 "sortOrder": "alphabetical",
@@ -114,7 +211,7 @@
                 "unlinkedCollapsed": false
               },
               "icon": "links-coming-in",
-              "title": "SPI的基础理解 的反向链接列表"
+              "title": "优先级翻转 的反向链接列表"
             }
           },
           {
@@ -166,41 +263,43 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "通信协议/SPI的基础理解.md",
+                "file": "优先级翻转.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "SPI的基础理解 的大纲"
+              "title": "优先级翻转 的大纲"
             }
           },
           {
-            "id": "f70935aae7c326ca",
+            "id": "23d82a8c5a5ff86e",
             "type": "leaf",
             "state": {
-              "type": "smart-connections-view",
+              "type": "copilot-chat-view",
               "state": {},
-              "icon": "smart-connections",
-              "title": "Connections"
+              "icon": "message-square",
+              "title": "Copilot"
             }
           },
           {
-            "id": "a01c168b820c20f5",
+            "id": "0eae5e483e17b014",
             "type": "leaf",
             "state": {
-              "type": "smart-lookup-view",
-              "state": {},
-              "icon": "smart-lookup",
-              "title": "Lookup"
+              "type": "file-properties",
+              "state": {
+                "file": "优先级翻转.md"
+              },
+              "icon": "lucide-info",
+              "title": "优先级翻转的笔记属性"
             }
           }
         ],
-        "currentTab": 6
+        "currentTab": 5
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 461.5
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -213,51 +312,55 @@
       "bases:新建数据库": false,
       "markdown-importer:打开 Markdown 格式转换器": false,
       "templater-obsidian:Templater": false,
-      "smart-connections:Smart Connections: Open connections view": false,
-      "smart-connections:Smart Lookup: Open lookup view": false,
-      "smart-connections:Smart Connections: Open random connection": false
+      "copilot:Open Copilot Chat": false
     }
   },
-  "active": "6c4972cb9a74a78d",
+  "active": "e376afd487d3d5b6",
   "lastOpenFiles": [
-    "语言与算法/C(编译性语言)的编译过程.md",
-    "语言与算法/函数/Malloc-Free函数.md",
-    "硬件与芯片/FSMC（内存扩展）的实现.md",
-    "硬件与芯片/RCC时钟的基础理解和ISR的基础概念.md",
-    "硬件与芯片/STM32F407启动源码的理解.md",
-    "硬件与芯片/显示屏(大体).md",
-    "硬件与芯片/基础的电机驱动理解.md",
-    "操作系统与内核/STM32-RTOS的接入问题.md",
-    "操作系统与内核/优先级问题.md",
-    "操作系统与内核/IO映射.md",
-    "操作系统与内核/用户内存空间分配.md",
-    "操作系统与内核/进程-线程-协程的理解.md",
-    "操作系统与内核/锁.md",
-    "通信协议/SPI的基础理解.md",
-    "操作系统与内核/信号量.md",
-    "操作系统与内核/实时操作系统里对内存调用的处理.md",
-    "操作系统与内核/上下文切换.md",
-    "操作系统与内核/多核并发的处理.md",
-    "操作系统与内核/进程调度算法.md",
-    "操作系统与内核/互斥和同步.md",
-    "操作系统与内核/管程.md",
-    "操作系统与内核/IPC.md",
-    "硬件与芯片/DMA(直接存储器访问).md",
-    "通信协议/UART的基础理解.md",
-    "语言与算法/函数/Voliate函数.md",
-    "硬件与芯片/硬件内存的架构.md",
-    "_old_Notes/Notes/assets/操作系统学习/file-20260127202128168.png",
-    "未命名",
-    "语言与算法/函数",
-    "通信协议",
-    "语言与算法",
-    "操作系统与内核",
-    "硬件与芯片",
-    "Data-Inqure",
-    "_old_Notes/Notes/assets/操作系统学习",
-    "外设库/未命名",
-    "外设库",
-    "{B0715ED6-2808-48E5-A574-4CE1000F74EF}.png",
-    "assest/{1C817B3F-455D-4912-85B8-491D57228109}.png"
+    "电气硬件-知识/电路基础(Circuit Theory)/2.电压源-电流源.md",
+    "电气硬件-知识/电路基础(Circuit Theory)/assets/2.电压源-电流源/c92b2898ad7f2f72bf769c74294e96be.jpg",
+    "电气硬件-知识/电路基础(Circuit Theory)/assets/2.电压源-电流源/966b244451910aec97463f53566b0f53.jpg",
+    "电气硬件-知识/电路基础(Circuit Theory)/assets/2.电压源-电流源/7b71b6be8c0e64eb1c30d9f3c5f9d4a4.jpg",
+    "电气硬件-知识/电路基础(Circuit Theory)/assets/2.电压源-电流源/{EEA4FC69-56A3-46DA-B1F1-3FF29A3C2BBF}.png",
+    "电气硬件-知识/电路基础(Circuit Theory)/assets/2.电压源-电流源/{4DFF3714-553B-44E9-93E9-DE3E9764260C}.png",
+    "电气硬件-知识/电路基础(Circuit Theory)/assets/2.电压源-电流源",
+    "电气硬件-知识/电路基础(Circuit Theory)/1. 电学量.md",
+    "电气硬件-知识/电路基础(Circuit Theory)/assets/1. 电学量",
+    "电气硬件-知识/电路基础(Circuit Theory)/assets/1. Charge, Current, Voltage",
+    "电气硬件-知识/电路基础(Circuit Theory)/assets",
+    "电气硬件-知识/电路基础(Circuit Theory)/assets/1. 电学量/file-20260409172932769.png",
+    "电气硬件-知识/电路基础(Circuit Theory)/assets/1. 电学量/file-20260409172932761.png",
+    "assets/1. Charge, Current, Voltage",
+    "assets",
+    "Template/视频笔记.md",
+    "工具/示波器·/未命名.md",
+    "电气硬件-知识/电路基础(Circuit Theory)",
+    "工具/示波器·/5.触发系统.md",
+    "工具/示波器·/1.示波器-概览.md",
+    "工具/示波器·/2.时域和波形.md",
+    "工具/示波器·/3.电压相关参数.md",
+    "工具/示波器·/4.示波器的时基.md",
+    "算法-Leetcode/136-位的异或.md",
+    "copilot/copilot-conversations/给我生成一份Osidian的template，但是适用的是我的leetcode的算法@20260409_120324.md",
+    "Template/FreeRtos-Study.md",
+    "Untitled.md",
+    "电气硬件-知识/电力电子/功率二极管.md",
+    "算法-Leetcode",
+    "电气硬件-知识/电力电子/assets/功率二极管/ead6b464735307961d90406c51fdaaeb.jpg",
+    "电气硬件-知识/电力电子/assets/功率二极管/150376975a5a07d391d2274ea306822b.jpg",
+    "电气硬件-知识/电力电子/assets/功率二极管",
+    "电气硬件-知识/电力电子/assets",
+    "嵌入式/工程实践/CRC验证操作.md",
+    "HardFault.md",
+    "调试-知识/CMake.md",
+    "调试-知识/Cortex-M4 核心寄存器与调用栈.md",
+    "嵌入式/操作系统与内核/IPC.md",
+    "嵌入式/通信协议/I2C的基础理解.md",
+    "嵌入式/通信协议/通信协议总览.md",
+    "嵌入式/语言/工程常识.md",
+    "嵌入式/语言/C(编译性语言)的编译过程.md",
+    "嵌入式/语言/幂等保护.md",
+    "嵌入式/语言/PID算法-闭环控制.md",
+    "嵌入式/工程实践/assets/STM32小车-FSM设计/433f2113f7882263b906c5049f5b52e6.jpg"
   ]
 }

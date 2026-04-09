@@ -2,7 +2,6 @@
   "templater-obsidian",
   "dataview",
   "obsidian-custom-attachment-location",
-  "obsidian-linter",
   "note-refactor-obsidian",
-  "smart-connections"
+  "copilot"
 ]
