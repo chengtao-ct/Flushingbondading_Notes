@@ -8,12 +8,12 @@
         "type": "tabs",
         "children": [
           {
-            "id": "c0ff44814815d377",
+            "id": "ea28db0db9edded9",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "嵌入式/工程实践/CRC验证操作.md",
+                "file": "工具/示波器·/4.示波器的时基.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -28,11 +28,11 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "CRC验证操作"
+              "title": "4.示波器的时基"
             }
           },
           {
-            "id": "0d9d77fb793238e1",
+            "id": "99c28076aa6183cc",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -56,12 +56,12 @@
             }
           },
           {
-            "id": "69bdfc03b17126f7",
+            "id": "64ca7c0b6c20acc5",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "工具/示波器·/1.示波器-概览.md",
+                "file": "电气硬件-知识/电路基础(Circuit Theory)/2.电压源-电流源.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -76,16 +76,16 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "1.示波器-概览"
+              "title": "2.电压源-电流源"
             }
           },
           {
-            "id": "729cfac944157afe",
+            "id": "98e26b70eaf7ef95",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "电气硬件-知识/电路基础(Circuit Theory)/1. 电学量.md",
+                "file": "指令集.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -100,16 +100,16 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "1. 电学量"
+              "title": "指令集"
             }
           },
           {
-            "id": "e376afd487d3d5b6",
+            "id": "1f98773edd716968",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "工具/示波器·/5.触发系统.md",
+                "file": "源码阅读/RT-thread源码阅读/2.启动主链分析.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -124,11 +124,35 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "5.触发系统"
+              "title": "2.启动主链分析"
+            }
+          },
+          {
+            "id": "5f534e3b390bac00",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "指令集.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "指令集"
             }
           }
         ],
-        "currentTab": 4
+        "currentTab": 5
       }
     ],
     "direction": "vertical"
@@ -299,7 +323,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 461.5
+    "width": 408.5,
+    "collapsed": true
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -315,52 +340,53 @@
       "copilot:Open Copilot Chat": false
     }
   },
-  "active": "e376afd487d3d5b6",
+  "active": "5f534e3b390bac00",
   "lastOpenFiles": [
-    "电气硬件-知识/电路基础(Circuit Theory)/2.电压源-电流源.md",
-    "电气硬件-知识/电路基础(Circuit Theory)/assets/2.电压源-电流源/c92b2898ad7f2f72bf769c74294e96be.jpg",
-    "电气硬件-知识/电路基础(Circuit Theory)/assets/2.电压源-电流源/966b244451910aec97463f53566b0f53.jpg",
-    "电气硬件-知识/电路基础(Circuit Theory)/assets/2.电压源-电流源/7b71b6be8c0e64eb1c30d9f3c5f9d4a4.jpg",
-    "电气硬件-知识/电路基础(Circuit Theory)/assets/2.电压源-电流源/{EEA4FC69-56A3-46DA-B1F1-3FF29A3C2BBF}.png",
-    "电气硬件-知识/电路基础(Circuit Theory)/assets/2.电压源-电流源/{4DFF3714-553B-44E9-93E9-DE3E9764260C}.png",
-    "电气硬件-知识/电路基础(Circuit Theory)/assets/2.电压源-电流源",
-    "电气硬件-知识/电路基础(Circuit Theory)/1. 电学量.md",
-    "电气硬件-知识/电路基础(Circuit Theory)/assets/1. 电学量",
-    "电气硬件-知识/电路基础(Circuit Theory)/assets/1. Charge, Current, Voltage",
-    "电气硬件-知识/电路基础(Circuit Theory)/assets",
-    "电气硬件-知识/电路基础(Circuit Theory)/assets/1. 电学量/file-20260409172932769.png",
-    "电气硬件-知识/电路基础(Circuit Theory)/assets/1. 电学量/file-20260409172932761.png",
-    "assets/1. Charge, Current, Voltage",
-    "assets",
-    "Template/视频笔记.md",
     "工具/示波器·/未命名.md",
-    "电气硬件-知识/电路基础(Circuit Theory)",
-    "工具/示波器·/5.触发系统.md",
-    "工具/示波器·/1.示波器-概览.md",
+    "工具/示波器·/7.示波器关键设置.md",
+    "嵌入式/操作系统与内核/FreeRTOS/STM32-RTOS的接入问题.md",
+    "嵌入式/操作系统与内核/FreeRTOS/FreeRtos-总体介绍.md",
+    "嵌入式/操作系统与内核/FreeRTOS/CLZ.md",
+    "嵌入式/操作系统与内核/FreeRTOS/内存管理/内存管理_Heap策略与选型.md",
+    "嵌入式/操作系统与内核/FreeRTOS/内存管理/内存管理_OOM与MallocFailedHook.md",
+    "嵌入式/操作系统与内核/FreeRTOS/内存管理/实时操作系统里对内存调用的处理.md",
+    "嵌入式/操作系统与内核/FreeRTOS/内存管理/内存管理_隐性开销_FPU与RunTimeStats.md",
+    "嵌入式/操作系统与内核/FreeRTOS/内存管理/内存管理_任务栈与溢出防护.md",
+    "嵌入式/操作系统与内核/FreeRTOS/内存管理/内存管理_概览.md",
+    "指令集.md",
+    "嵌入式/工程实践/STM-M4",
+    "调试-知识/Cmake-STM",
+    "调试-知识/Cmake-STM/Cortex-M4 核心寄存器与调用栈.md",
+    "调试-知识/Cmake-STM/CMake.md",
+    "调试-知识/Cmake-STM/文件格式.md",
+    "调试-知识/Cmake-STM/配置文件链路.md",
+    "调试-知识/Cmake-STM/调试全景数据流.md",
+    "嵌入式/语言/Python/一日速通基础Python.md",
+    "嵌入式/语言/Python",
+    "嵌入式/语言/Python.md",
+    "源码阅读/RT-thread源码阅读/2.启动主链分析.md",
+    "嵌入式/语言/C",
+    "源码阅读/RT-thread源码阅读/预览与计划.md",
+    "源码阅读/RT-thread源码阅读/1.总体架构的理解.md",
+    "嵌入式/硬件与芯片/MMU(内存管理单元).md",
     "工具/示波器·/2.时域和波形.md",
     "工具/示波器·/3.电压相关参数.md",
-    "工具/示波器·/4.示波器的时基.md",
-    "算法-Leetcode/136-位的异或.md",
-    "copilot/copilot-conversations/给我生成一份Osidian的template，但是适用的是我的leetcode的算法@20260409_120324.md",
-    "Template/FreeRtos-Study.md",
-    "Untitled.md",
-    "电气硬件-知识/电力电子/功率二极管.md",
-    "算法-Leetcode",
-    "电气硬件-知识/电力电子/assets/功率二极管/ead6b464735307961d90406c51fdaaeb.jpg",
-    "电气硬件-知识/电力电子/assets/功率二极管/150376975a5a07d391d2274ea306822b.jpg",
-    "电气硬件-知识/电力电子/assets/功率二极管",
-    "电气硬件-知识/电力电子/assets",
-    "嵌入式/工程实践/CRC验证操作.md",
-    "HardFault.md",
-    "调试-知识/CMake.md",
-    "调试-知识/Cortex-M4 核心寄存器与调用栈.md",
-    "嵌入式/操作系统与内核/IPC.md",
-    "嵌入式/通信协议/I2C的基础理解.md",
-    "嵌入式/通信协议/通信协议总览.md",
-    "嵌入式/语言/工程常识.md",
-    "嵌入式/语言/C(编译性语言)的编译过程.md",
-    "嵌入式/语言/幂等保护.md",
-    "嵌入式/语言/PID算法-闭环控制.md",
-    "嵌入式/工程实践/assets/STM32小车-FSM设计/433f2113f7882263b906c5049f5b52e6.jpg"
+    "电气硬件-知识/电力电子/晶闸管.md",
+    "电气硬件-知识/电力电子/assets/晶闸管/829de767663b7d5256d5192e30c11d95.jpg",
+    "电气硬件-知识/电力电子/assets/晶闸管/{859019D3-3153-42F1-AA18-C2ED2E9FC0DB}.png",
+    "电气硬件-知识/电力电子/assets/晶闸管/{D10B3DE6-1424-4708-AFE7-E5E6F543A9EC}.png",
+    "电气硬件-知识/电力电子/assets/晶闸管/{536A7F94-D691-4AA2-8018-21B194838F2A}.png",
+    "电气硬件-知识/电力电子/assets/晶闸管",
+    "算法-Leetcode/assets/206-反转链表/937563490cb305075090f59c3b483db3.jpg",
+    "算法-Leetcode/assets/206-反转链表",
+    "算法-Leetcode/assets",
+    "电气硬件-知识/电路基础(Circuit Theory)/assets/4.Kircchoff's Laws/{DF44C56C-BB77-4F1B-89E7-FAFB6A7FE1BD}.png",
+    "电气硬件-知识/电路基础(Circuit Theory)/assets/4.Kircchoff's Laws/{B5DE44B8-CF2C-4D2D-96D6-8107EB898654}.png",
+    "电气硬件-知识/电路基础(Circuit Theory)/assets/4.Kircchoff's Laws/{63C31412-3BBF-4402-81A4-BF5ABA1039B2}.png",
+    "电气硬件-知识/电路基础(Circuit Theory)/assets/4.Kircchoff's Laws",
+    "电气硬件-知识/电路基础(Circuit Theory)/assets/3.受控电源-电阻-并联与串联/{CF7FE8DB-7723-4B0D-BDCC-0E71446ED0F3}.png",
+    "电气硬件-知识/电路基础(Circuit Theory)/assets/3.受控电源-电阻-并联与串联",
+    "电气硬件-知识/电路基础(Circuit Theory)/assets/3.受控电源-电阻/{64625BA7-6457-4CDC-8A0A-3F987980E5AF} 1.png",
+    "电气硬件-知识/电路基础(Circuit Theory)/assets/3.受控电源-电阻"
   ]
 }

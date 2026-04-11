@@ -281,8 +281,9 @@ GPIOA->ODR |= (1 << 5);
 ## 🔗 知识拓扑
 
 **相关概念**：
-[STM32F407启动源码的理解](STM32F407启动源码的理解.md):
+[STM32F407启动源码的理解](../STM32F407启动源码的理解.md):
 [STM32F407ZGT6的介绍](STM32F407ZGT6的介绍.md):
-[STM32-RTOS的接入问题](../操作系统与内核/FreeRTOS/STM32-RTOS的接入问题.md)
-[详细介绍一下_HardFault@20260305_000623](../../copilot/copilot-conversations/详细介绍一下_HardFault@20260305_000623.md)
+[STM32-RTOS的接入问题](../../操作系统与内核/FreeRTOS/STM32-RTOS的接入问题.md)
+[详细介绍一下_HardFault@20260305_000623](../../../copilot/copilot-conversations/详细介绍一下_HardFault@20260305_000623.md)
+[Xtensa LX6 双核架构](Xtensa%20LX6%20双核架构.md)
 

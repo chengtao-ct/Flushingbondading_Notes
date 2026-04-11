@@ -2193,13 +2193,13 @@ if ($hexItem.LastWriteTime -lt $elfItem.LastWriteTime) {
 
 ### 🔗 知识网络
 
-- ⬆️ **上位知识**：[[嵌入式开发工具链知识体系]]、[[../../调试-知识/CMake]]
+- ⬆️ **上位知识**：[[嵌入式开发工具链知识体系]]、[[../../调试-知识/Cmake-STM/CMake]]
 - ⬇️ **下位知识**：[[toolchain.cmake 编写规范]]、[[PowerShell 脚本设计模式]]
 - ➡️ **平级关联**：[[ELF文件结构]]、[[GDB调试原理]]、[[ST-LINK调试器]]
 
 ### 核心概念链接
 
-- [[CMake]]：构建系统生成器
+- [[../../调试-知识/Cmake-STM/CMake]]：构建系统生成器
 - [[Ninja]]：高速构建系统
 - [[交叉编译]]：在宿主机上编译目标机代码
 - [[SWD接口]]：Serial Wire Debug，ARM 调试接口
