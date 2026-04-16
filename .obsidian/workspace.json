@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "工具/示波器·/4.示波器的时基.md",
+                "file": "源码阅读/RT-thread源码阅读/1.总体架构的理解.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -28,16 +28,16 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "4.示波器的时基"
+              "title": "1.总体架构的理解"
             }
           },
           {
-            "id": "99c28076aa6183cc",
+            "id": "b350d0acb12d3084",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "电气硬件-知识/电力电子/功率二极管.md",
+                "file": "嵌入式/语言/C/注释风格.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -52,16 +52,16 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "功率二极管"
+              "title": "注释风格"
             }
           },
           {
-            "id": "64ca7c0b6c20acc5",
+            "id": "b57c9857441e32a5",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "电气硬件-知识/电路基础(Circuit Theory)/2.电压源-电流源.md",
+                "file": "嵌入式/语言/C/PID算法-闭环控制.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -76,16 +76,16 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "2.电压源-电流源"
+              "title": "PID算法-闭环控制"
             }
           },
           {
-            "id": "98e26b70eaf7ef95",
+            "id": "0cef6ea364449875",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "指令集.md",
+                "file": "源码阅读/RT-thread源码阅读/4.(Thread)线程的创建和理解.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -100,16 +100,16 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "指令集"
+              "title": "4.(Thread)线程的创建和理解"
             }
           },
           {
-            "id": "1f98773edd716968",
+            "id": "9c084e0611211b98",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "源码阅读/RT-thread源码阅读/2.启动主链分析.md",
+                "file": "电气硬件-知识/电力电子/MOSFET.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -124,16 +124,16 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "2.启动主链分析"
+              "title": "MOSFET"
             }
           },
           {
-            "id": "5f534e3b390bac00",
+            "id": "422c104cc83e32a4",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "指令集.md",
+                "file": "电气硬件-知识/电力电子/IGBT.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -148,11 +148,35 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "指令集"
+              "title": "IGBT"
+            }
+          },
+          {
+            "id": "5af41b0e9e97093c",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "8.Source Transformation & Enger wirh power.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "8.Source Transformation & Enger wirh power"
             }
           }
         ],
-        "currentTab": 5
+        "currentTab": 6
       }
     ],
     "direction": "vertical"
@@ -340,53 +364,53 @@
       "copilot:Open Copilot Chat": false
     }
   },
-  "active": "5f534e3b390bac00",
+  "active": "5af41b0e9e97093c",
   "lastOpenFiles": [
-    "工具/示波器·/未命名.md",
-    "工具/示波器·/7.示波器关键设置.md",
-    "嵌入式/操作系统与内核/FreeRTOS/STM32-RTOS的接入问题.md",
-    "嵌入式/操作系统与内核/FreeRTOS/FreeRtos-总体介绍.md",
-    "嵌入式/操作系统与内核/FreeRTOS/CLZ.md",
-    "嵌入式/操作系统与内核/FreeRTOS/内存管理/内存管理_Heap策略与选型.md",
-    "嵌入式/操作系统与内核/FreeRTOS/内存管理/内存管理_OOM与MallocFailedHook.md",
-    "嵌入式/操作系统与内核/FreeRTOS/内存管理/实时操作系统里对内存调用的处理.md",
-    "嵌入式/操作系统与内核/FreeRTOS/内存管理/内存管理_隐性开销_FPU与RunTimeStats.md",
-    "嵌入式/操作系统与内核/FreeRTOS/内存管理/内存管理_任务栈与溢出防护.md",
-    "嵌入式/操作系统与内核/FreeRTOS/内存管理/内存管理_概览.md",
-    "指令集.md",
-    "嵌入式/工程实践/STM-M4",
-    "调试-知识/Cmake-STM",
-    "调试-知识/Cmake-STM/Cortex-M4 核心寄存器与调用栈.md",
-    "调试-知识/Cmake-STM/CMake.md",
-    "调试-知识/Cmake-STM/文件格式.md",
-    "调试-知识/Cmake-STM/配置文件链路.md",
-    "调试-知识/Cmake-STM/调试全景数据流.md",
-    "嵌入式/语言/Python/一日速通基础Python.md",
-    "嵌入式/语言/Python",
-    "嵌入式/语言/Python.md",
-    "源码阅读/RT-thread源码阅读/2.启动主链分析.md",
-    "嵌入式/语言/C",
+    "电气硬件-知识/电力电子/IGBT.md",
+    "8.Source Transformation & Enger wirh power.md",
+    "电气硬件-知识/电力电子/assets/IGBT/{E32D0101-8F6D-4FA1-983D-E2F0B7453D1B}.png",
+    "电气硬件-知识/电力电子/assets/IGBT/{658F22C4-C739-4DC0-87EF-F26399322A81}.png",
+    "电气硬件-知识/电力电子/MOSFET.md",
+    "电气硬件-知识/电力电子/assets/IGBT/{91288D14-14A8-43D3-BD6B-88D463D9B1DF}.png",
+    "电气硬件-知识/电力电子/assets/IGBT/{0F6AFFCD-C64A-4776-BD49-BAF47676ED01}.png",
+    "电气硬件-知识/电力电子/assets/IGBT/{F383506D-07C1-42C0-844E-E297DD6A7479}.png",
+    "电气硬件-知识/电力电子/assets/IGBT",
+    "电气硬件-知识/电力电子/晶闸管（SCR）以及衍生的TRIAC与GTO.md",
+    "电气硬件-知识/电力电子/assets/MOSFET/{61932C47-CF47-4645-9735-ED5A9E82BEB6}.png",
+    "电气硬件-知识/电力电子/assets/MOSFET/{94A1A873-B259-4612-B59E-33908D93D5F5}.png",
+    "电气硬件-知识/电力电子/assets/MOSFET/{7E18137E-7BF7-422E-85ED-60119DCC1B42}.png",
+    "电气硬件-知识/电力电子/assets/MOSFET/{DC1A37FD-5929-4C6D-ADEB-C115BCC3C6FB}.png",
+    "电气硬件-知识/电力电子/assets/MOSFET/{A2D66F7E-653A-495B-B1D0-84E0611EC3E7}.png",
+    "电气硬件-知识/电力电子/assets/MOSFET",
+    "源码阅读/RT-thread源码阅读/5.Scheduler(调度器).md",
+    "源码阅读/RT-thread源码阅读/4.(Thread)线程的创建和理解.md",
     "源码阅读/RT-thread源码阅读/预览与计划.md",
+    "嵌入式/语言/C/注释风格.md",
     "源码阅读/RT-thread源码阅读/1.总体架构的理解.md",
-    "嵌入式/硬件与芯片/MMU(内存管理单元).md",
-    "工具/示波器·/2.时域和波形.md",
-    "工具/示波器·/3.电压相关参数.md",
-    "电气硬件-知识/电力电子/晶闸管.md",
-    "电气硬件-知识/电力电子/assets/晶闸管/829de767663b7d5256d5192e30c11d95.jpg",
-    "电气硬件-知识/电力电子/assets/晶闸管/{859019D3-3153-42F1-AA18-C2ED2E9FC0DB}.png",
-    "电气硬件-知识/电力电子/assets/晶闸管/{D10B3DE6-1424-4708-AFE7-E5E6F543A9EC}.png",
-    "电气硬件-知识/电力电子/assets/晶闸管/{536A7F94-D691-4AA2-8018-21B194838F2A}.png",
-    "电气硬件-知识/电力电子/assets/晶闸管",
-    "算法-Leetcode/assets/206-反转链表/937563490cb305075090f59c3b483db3.jpg",
-    "算法-Leetcode/assets/206-反转链表",
-    "算法-Leetcode/assets",
-    "电气硬件-知识/电路基础(Circuit Theory)/assets/4.Kircchoff's Laws/{DF44C56C-BB77-4F1B-89E7-FAFB6A7FE1BD}.png",
-    "电气硬件-知识/电路基础(Circuit Theory)/assets/4.Kircchoff's Laws/{B5DE44B8-CF2C-4D2D-96D6-8107EB898654}.png",
-    "电气硬件-知识/电路基础(Circuit Theory)/assets/4.Kircchoff's Laws/{63C31412-3BBF-4402-81A4-BF5ABA1039B2}.png",
-    "电气硬件-知识/电路基础(Circuit Theory)/assets/4.Kircchoff's Laws",
-    "电气硬件-知识/电路基础(Circuit Theory)/assets/3.受控电源-电阻-并联与串联/{CF7FE8DB-7723-4B0D-BDCC-0E71446ED0F3}.png",
-    "电气硬件-知识/电路基础(Circuit Theory)/assets/3.受控电源-电阻-并联与串联",
-    "电气硬件-知识/电路基础(Circuit Theory)/assets/3.受控电源-电阻/{64625BA7-6457-4CDC-8A0A-3F987980E5AF} 1.png",
-    "电气硬件-知识/电路基础(Circuit Theory)/assets/3.受控电源-电阻"
+    "物联网/网络协议栈",
+    "物联网/图形页面GUI",
+    "未命名",
+    "源码阅读/RT-thread源码阅读/2.启动主链分析.md",
+    "源码阅读/RT-thread源码阅读/3.深化启动的理解+理解对象系统.md",
+    "copilot/copilot-conversations/帮我重新排版这个文件，分步进行一步一步来，先进行规划，@20260416_115745.md",
+    "嵌入式/语言/C/Hook函数设计.md",
+    "嵌入式/语言/C/PID算法-闭环控制.md",
+    "嵌入式/语言/C/memset函数.md",
+    "嵌入式/语言/C/C语言的继承和多态.md",
+    "嵌入式/语言/C/侵入式链表设计.md",
+    "嵌入式/语言/C/幂等保护.md",
+    "嵌入式/语言/C/函数指针类型定义.md",
+    "嵌入式/语言/C/工程常识.md",
+    "算法-Leetcode/Easy/104-二叉树的最大深度.md",
+    "算法-Leetcode/Mid/142-环形链表 II.md",
+    "算法-Leetcode/Mid/assets/142-环形链表 II",
+    "算法-Leetcode/Mid/assets",
+    "算法-Leetcode/Mid/141-环形链表.md",
+    "算法-Leetcode/Easy/101-对称二叉树.md",
+    "算法-Leetcode/Easy/28-找出字符串中第一个匹配项.md",
+    "算法-Leetcode/Easy/20-有效的括号.md",
+    "电气硬件-知识/电路基础(Circuit Theory)/assets/7.Thevenin's Theorem and Norton's Theorem",
+    "电气硬件-知识/电路基础(Circuit Theory)/assets/7.Thevenin's Theorem and",
+    "算法-Leetcode/Mid"
   ]
 }
