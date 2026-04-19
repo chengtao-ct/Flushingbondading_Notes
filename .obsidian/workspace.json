@@ -80,12 +80,12 @@
             }
           },
           {
-            "id": "0cef6ea364449875",
+            "id": "5f4dadc9614ff6c0",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "源码阅读/RT-thread源码阅读/4.(Thread)线程的创建和理解.md",
+                "file": "源码阅读/RT-thread源码阅读/5.Scheduler(调度器)-单核和底层驱动.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -100,16 +100,16 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "4.(Thread)线程的创建和理解"
+              "title": "5.Scheduler(调度器)-单核和底层驱动"
             }
           },
           {
-            "id": "9c084e0611211b98",
+            "id": "c82e349d26b470c2",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "电气硬件-知识/电力电子/MOSFET.md",
+                "file": "94-二叉树的中序遍历.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -124,16 +124,16 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "MOSFET"
+              "title": "94-二叉树的中序遍历"
             }
           },
           {
-            "id": "422c104cc83e32a4",
+            "id": "ce0bafa0a1aa7b13",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "电气硬件-知识/电力电子/IGBT.md",
+                "file": "电气硬件-知识/电力电子/功率三极管.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -148,16 +148,16 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "IGBT"
+              "title": "功率三极管"
             }
           },
           {
-            "id": "5af41b0e9e97093c",
+            "id": "d7c1ccfd881e9eaf",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "8.Source Transformation & Enger wirh power.md",
+                "file": "电气硬件-知识/电力电子/1.总览.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -172,11 +172,83 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "8.Source Transformation & Enger wirh power"
+              "title": "1.总览"
+            }
+          },
+          {
+            "id": "62a75d239d646959",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "嵌入式/通信协议/通信协议总览.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "通信协议总览"
+            }
+          },
+          {
+            "id": "c3e7d0151c79c479",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "嵌入式/通信协议/SPI的基础理解.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "SPI的基础理解"
+            }
+          },
+          {
+            "id": "cd7ceb25337c89f8",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "嵌入式/通信协议/2.I2C的基础理解.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "2.I2C的基础理解"
             }
           }
         ],
-        "currentTab": 6
+        "currentTab": 9
       }
     ],
     "direction": "vertical"
@@ -364,53 +436,52 @@
       "copilot:Open Copilot Chat": false
     }
   },
-  "active": "5af41b0e9e97093c",
+  "active": "cd7ceb25337c89f8",
   "lastOpenFiles": [
-    "电气硬件-知识/电力电子/IGBT.md",
-    "8.Source Transformation & Enger wirh power.md",
-    "电气硬件-知识/电力电子/assets/IGBT/{E32D0101-8F6D-4FA1-983D-E2F0B7453D1B}.png",
-    "电气硬件-知识/电力电子/assets/IGBT/{658F22C4-C739-4DC0-87EF-F26399322A81}.png",
-    "电气硬件-知识/电力电子/MOSFET.md",
-    "电气硬件-知识/电力电子/assets/IGBT/{91288D14-14A8-43D3-BD6B-88D463D9B1DF}.png",
-    "电气硬件-知识/电力电子/assets/IGBT/{0F6AFFCD-C64A-4776-BD49-BAF47676ED01}.png",
-    "电气硬件-知识/电力电子/assets/IGBT/{F383506D-07C1-42C0-844E-E297DD6A7479}.png",
-    "电气硬件-知识/电力电子/assets/IGBT",
+    "嵌入式/通信协议/通信协议总览.md",
+    "嵌入式/通信协议/3.SPI的基础理解.md",
+    "嵌入式/通信协议/1. UART的基础理解.md",
+    "嵌入式/通信协议/2.I2C的基础理解.md",
+    "电气硬件-知识/电路基础(Circuit Theory)/第二部分：电子元件/1. Capacitors.md",
+    "电气硬件-知识/电路基础(Circuit Theory)/第二部分：电子元件/assets/1. Capacitors/{8FFF0E0F-DE53-4C34-932A-6CE3EFFE6130}.png",
+    "电气硬件-知识/电路基础(Circuit Theory)/第二部分：电子元件/assets/1. Capacitors/{71D2B042-A7E8-49B4-A876-339553FFE181}.png",
+    "电气硬件-知识/电路基础(Circuit Theory)/第二部分：电子元件/assets/1. Capacitors",
+    "电气硬件-知识/电路基础(Circuit Theory)/第二部分：电子元件/assets",
+    "电气硬件-知识/电路基础(Circuit Theory)/第二部分：电子元件",
+    "嵌入式/通信协议/3. SPI的基础理解.md",
+    "电气硬件-知识/电路基础(Circuit Theory)/第一部分：电路基础定理/assets/2.电压源-电流源",
+    "电气硬件-知识/电路基础(Circuit Theory)/第一部分：电路基础定理/assets/1. 电学量",
+    "电气硬件-知识/电路基础(Circuit Theory)/第一部分：电路基础定理/assets",
+    "第一部分：电路基础定理.md",
+    "电气硬件-知识/电路基础(Circuit Theory)/第一部分：电路基础定理",
+    "电气硬件-知识/电路基础(Circuit Theory)/第一部分：电路基础定理/8.Source Transformation & Enger wirh power.md",
+    "电气硬件-知识/电路基础(Circuit Theory)/第一部分：电路基础定理/assets 1/8.Source Transformation & Enger wirh power/{207C6DD0-9E9B-4D18-A4A5-5129C3297E0F}.png",
+    "电气硬件-知识/电路基础(Circuit Theory)/第一部分：电路基础定理/assets 1/8.Source Transformation & Enger wirh power/{FFE16DE3-C6D4-4F5C-BA0B-8CD2CB146652}.png",
+    "电气硬件-知识/电路基础(Circuit Theory)/第一部分：电路基础定理/assets 1/8.Source Transformation & Enger wirh power",
+    "电气硬件-知识/电路基础(Circuit Theory)/第一部分：电路基础定理/7.Thevenin's Theorem and Norton's Theorem.md",
+    "嵌入式/硬件与芯片/外设/基础的电机驱动理解.md",
+    "嵌入式/硬件与芯片/外设/显示屏(大体).md",
+    "嵌入式/硬件与芯片/外设/ADC(模数转换器).md",
+    "嵌入式/硬件与芯片/外设/DMA(直接存储器访问).md",
+    "嵌入式/硬件与芯片/外设/FSMC（内存扩展）的实现.md",
+    "嵌入式/硬件与芯片/外设/RCC时钟的基础理解和ISR的基础概念.md",
+    "嵌入式/硬件与芯片/外设/TIM（定时器）.md",
     "电气硬件-知识/电力电子/晶闸管（SCR）以及衍生的TRIAC与GTO.md",
-    "电气硬件-知识/电力电子/assets/MOSFET/{61932C47-CF47-4645-9735-ED5A9E82BEB6}.png",
-    "电气硬件-知识/电力电子/assets/MOSFET/{94A1A873-B259-4612-B59E-33908D93D5F5}.png",
-    "电气硬件-知识/电力电子/assets/MOSFET/{7E18137E-7BF7-422E-85ED-60119DCC1B42}.png",
-    "电气硬件-知识/电力电子/assets/MOSFET/{DC1A37FD-5929-4C6D-ADEB-C115BCC3C6FB}.png",
-    "电气硬件-知识/电力电子/assets/MOSFET/{A2D66F7E-653A-495B-B1D0-84E0611EC3E7}.png",
-    "电气硬件-知识/电力电子/assets/MOSFET",
-    "源码阅读/RT-thread源码阅读/5.Scheduler(调度器).md",
-    "源码阅读/RT-thread源码阅读/4.(Thread)线程的创建和理解.md",
-    "源码阅读/RT-thread源码阅读/预览与计划.md",
-    "嵌入式/语言/C/注释风格.md",
-    "源码阅读/RT-thread源码阅读/1.总体架构的理解.md",
-    "物联网/网络协议栈",
-    "物联网/图形页面GUI",
-    "未命名",
-    "源码阅读/RT-thread源码阅读/2.启动主链分析.md",
-    "源码阅读/RT-thread源码阅读/3.深化启动的理解+理解对象系统.md",
-    "copilot/copilot-conversations/帮我重新排版这个文件，分步进行一步一步来，先进行规划，@20260416_115745.md",
-    "嵌入式/语言/C/Hook函数设计.md",
-    "嵌入式/语言/C/PID算法-闭环控制.md",
-    "嵌入式/语言/C/memset函数.md",
-    "嵌入式/语言/C/C语言的继承和多态.md",
-    "嵌入式/语言/C/侵入式链表设计.md",
-    "嵌入式/语言/C/幂等保护.md",
-    "嵌入式/语言/C/函数指针类型定义.md",
-    "嵌入式/语言/C/工程常识.md",
-    "算法-Leetcode/Easy/104-二叉树的最大深度.md",
-    "算法-Leetcode/Mid/142-环形链表 II.md",
-    "算法-Leetcode/Mid/assets/142-环形链表 II",
-    "算法-Leetcode/Mid/assets",
-    "算法-Leetcode/Mid/141-环形链表.md",
-    "算法-Leetcode/Easy/101-对称二叉树.md",
-    "算法-Leetcode/Easy/28-找出字符串中第一个匹配项.md",
-    "算法-Leetcode/Easy/20-有效的括号.md",
-    "电气硬件-知识/电路基础(Circuit Theory)/assets/7.Thevenin's Theorem and Norton's Theorem",
-    "电气硬件-知识/电路基础(Circuit Theory)/assets/7.Thevenin's Theorem and",
-    "算法-Leetcode/Mid"
+    "电气硬件-知识/电力电子/IGBT.md",
+    "电气硬件-知识/电力电子/MOSFET.md",
+    "电气硬件-知识/电力电子/1.总览.md",
+    "电气硬件-知识/电力电子/电子元件共性.md",
+    "电气硬件-知识/电力电子/assets/电子元件共性/{73870134-3D77-469D-88AF-142232F738CD}.png",
+    "电气硬件-知识/电力电子/功率二极管.md",
+    "电气硬件-知识/电力电子/功率三极管.md",
+    "电气硬件-知识/电力电子/assets/电子元件共性/{77C48722-66F5-44C5-8D9B-58E1369ADBB4}.png",
+    "电气硬件-知识/电力电子/assets/电子元件共性/{3A5A8735-5E40-4BCC-B965-75FA9A672111}.png",
+    "电气硬件-知识/电力电子/assets/电子元件共性",
+    "电气硬件-知识/电力电子/assets/IGBT/42d85164df0074fb0295001850cf09e6.jpg",
+    "电气硬件-知识/电力电子/assets/IGBT/ff8fc93af9fce2a68366565fa4d15522.jpg",
+    "算法-Leetcode/Easy/191-位 1 的个数 -汉明重量.md",
+    "算法-Leetcode/Easy/2的幂.md",
+    "电气硬件-知识/电力电子/assets/IGBT/{E32D0101-8F6D-4FA1-983D-E2F0B7453D1B}.png",
+    "电气硬件-知识/电力电子/assets/IGBT"
   ]
 }

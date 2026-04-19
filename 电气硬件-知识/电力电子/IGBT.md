@@ -19,3 +19,11 @@
 
 
 ![](assets/IGBT/{E32D0101-8F6D-4FA1-983D-E2F0B7453D1B}.png)
+
+
+## 特性
+
+![](assets/IGBT/ff8fc93af9fce2a68366565fa4d15522.jpg)
+
+
+![](assets/IGBT/42d85164df0074fb0295001850cf09e6.jpg)
