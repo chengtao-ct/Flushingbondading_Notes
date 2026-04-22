@@ -13,127 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "源码阅读/RT-thread源码阅读/1.总体架构的理解.md",
-                "mode": "source",
-                "source": false,
-                "backlinks": true,
-                "backlinkOpts": {
-                  "collapseAll": false,
-                  "extraContext": false,
-                  "sortOrder": "alphabetical",
-                  "showSearch": false,
-                  "searchQuery": "",
-                  "backlinkCollapsed": false,
-                  "unlinkedCollapsed": true
-                }
-              },
-              "icon": "lucide-file",
-              "title": "1.总体架构的理解"
-            }
-          },
-          {
-            "id": "b350d0acb12d3084",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "嵌入式/语言/C/注释风格.md",
-                "mode": "source",
-                "source": false,
-                "backlinks": true,
-                "backlinkOpts": {
-                  "collapseAll": false,
-                  "extraContext": false,
-                  "sortOrder": "alphabetical",
-                  "showSearch": false,
-                  "searchQuery": "",
-                  "backlinkCollapsed": false,
-                  "unlinkedCollapsed": true
-                }
-              },
-              "icon": "lucide-file",
-              "title": "注释风格"
-            }
-          },
-          {
-            "id": "b57c9857441e32a5",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "嵌入式/语言/C/PID算法-闭环控制.md",
-                "mode": "source",
-                "source": false,
-                "backlinks": true,
-                "backlinkOpts": {
-                  "collapseAll": false,
-                  "extraContext": false,
-                  "sortOrder": "alphabetical",
-                  "showSearch": false,
-                  "searchQuery": "",
-                  "backlinkCollapsed": false,
-                  "unlinkedCollapsed": true
-                }
-              },
-              "icon": "lucide-file",
-              "title": "PID算法-闭环控制"
-            }
-          },
-          {
-            "id": "5f4dadc9614ff6c0",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "调试烧录-知识/配置文件链路.md",
-                "mode": "source",
-                "source": false,
-                "backlinks": true,
-                "backlinkOpts": {
-                  "collapseAll": false,
-                  "extraContext": false,
-                  "sortOrder": "alphabetical",
-                  "showSearch": false,
-                  "searchQuery": "",
-                  "backlinkCollapsed": false,
-                  "unlinkedCollapsed": true
-                }
-              },
-              "icon": "lucide-file",
-              "title": "配置文件链路"
-            }
-          },
-          {
-            "id": "3092d48b4605605c",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "嵌入式/通信协议/4. CAN的基础理解.md",
-                "mode": "preview",
-                "source": false,
-                "backlinks": true,
-                "backlinkOpts": {
-                  "collapseAll": false,
-                  "extraContext": false,
-                  "sortOrder": "alphabetical",
-                  "showSearch": false,
-                  "searchQuery": "",
-                  "backlinkCollapsed": false,
-                  "unlinkedCollapsed": true
-                }
-              },
-              "icon": "lucide-file",
-              "title": "4. CAN的基础理解"
-            }
-          },
-          {
-            "id": "e62064b441637296",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "嵌入式/硬件与芯片/外设/TIM（定时器）.md",
+                "file": "嵌入式/操作库/STM-HAL库/TIM（定时器）.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -152,12 +32,12 @@
             }
           },
           {
-            "id": "d846a199c068eae3",
+            "id": "9ac12d6c5a6933e1",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "源码阅读/RT-thread源码阅读/预览与计划.md",
+                "file": "TIM的基础理解.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -172,35 +52,11 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "预览与计划"
-            }
-          },
-          {
-            "id": "f52ce0010d304d81",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "源码阅读/RT-thread源码阅读/7.IPC-.md",
-                "mode": "source",
-                "source": false,
-                "backlinks": true,
-                "backlinkOpts": {
-                  "collapseAll": false,
-                  "extraContext": false,
-                  "sortOrder": "alphabetical",
-                  "showSearch": false,
-                  "searchQuery": "",
-                  "backlinkCollapsed": false,
-                  "unlinkedCollapsed": true
-                }
-              },
-              "icon": "lucide-file",
-              "title": "7.IPC-"
+              "title": "TIM的基础理解"
             }
           }
         ],
-        "currentTab": 7
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -388,53 +244,53 @@
       "copilot:Open Copilot Chat": false
     }
   },
-  "active": "f52ce0010d304d81",
+  "active": "9ac12d6c5a6933e1",
   "lastOpenFiles": [
-    "源码阅读/RT-thread源码阅读/预览与计划.md",
-    "源码阅读/RT-thread源码阅读/7.IPC-.md",
-    "指令集.md",
-    "源码阅读/RT-thread源码阅读/6.Scheduler-上层调度.md",
-    "电气硬件-知识/电路基础(Circuit Theory)/第二部分：电子元件/1. Capacitors.md",
-    "嵌入式/操作库/STM-HAL库/GPIO.md",
-    "电气硬件-知识/电路基础(Circuit Theory)/第二部分：电子元件/assets/1. Capacitors/{11526647-DD7B-4E9F-8827-72CC3485B206}.png",
-    "嵌入式/操作库/STM-HAL库/assets/GPIO/{AA8A7F44-6898-4E23-B6D8-D865F8318F6C}.png",
-    "嵌入式/操作库/STM-HAL库/assets/GPIO/{09CCE169-B734-4BBC-B0CC-76EC35B95B94}.png",
-    "嵌入式/操作库/STM-HAL库/assets/GPIO/GPIO.jpg",
-    "嵌入式/操作库/STM-HAL库/assets/GPIO/042b0db95049b278212bb94eabf4d6c9.jpg",
-    "嵌入式/操作库/STM-HAL库/assets/GPIO/2874da28ee00cf54874bc9ec7132655b.jpg",
-    "嵌入式/操作库/STM-HAL库/assets/GPIO/a46b3c24f1a4e640afb9caa3ca7dc927.jpg",
-    "嵌入式/操作库/STM-HAL库/assets/GPIO/9f920e390a04c1bf13b4e2ab01d37d34.jpg",
-    "嵌入式/操作库/STM-HAL库/assets/GPIO",
-    "嵌入式/操作库/STM-HAL库/assets",
-    "嵌入式/硬件与芯片/外设/TIM（定时器）.md",
-    "嵌入式/操作库",
-    "嵌入式/硬件与芯片/外设/FSMC（内存扩展）的实现.md",
-    "嵌入式/硬件与芯片/外设/DMA(直接存储器访问).md",
-    "嵌入式/硬件与芯片/外设/显示屏(大体).md",
-    "嵌入式/硬件与芯片/外设/基础的电机驱动理解.md",
-    "嵌入式/硬件与芯片/外设/ADC(模数转换器).md",
-    "嵌入式/硬件与芯片/外设/RCC时钟的基础理解和ISR的基础概念.md",
-    "嵌入式/语言/C/memset函数.md",
-    "嵌入式/操作库/STM-HAL库",
-    "嵌入式/语言/C/函数指针类型定义.md",
-    "嵌入式/语言/C/工程常识.md",
-    "嵌入式/语言/C/幂等保护.md",
-    "嵌入式/语言/C/侵入式链表设计.md",
-    "嵌入式/语言/C/注释风格.md",
-    "嵌入式/操作系统与内核/FSM.md",
-    "嵌入式/操作系统与内核/优先级问题.md",
-    "源码阅读/RT-thread源码阅读/1.总体架构的理解.md",
-    "源码阅读/RT-thread源码阅读/2.启动主链分析.md",
-    "算法-Leetcode/Mid/142-环形链表 II.md",
-    "算法-Leetcode/Mid/207-课程表.md",
-    "嵌入式/通信协议/4. CAN的基础理解.md",
-    "电气硬件-知识/电路基础(Circuit Theory)/第二部分：电子元件/assets/1. Capacitors/{8FFF0E0F-DE53-4C34-932A-6CE3EFFE6130}.png",
-    "电气硬件-知识/电路基础(Circuit Theory)/第二部分：电子元件/assets/1. Capacitors/{71D2B042-A7E8-49B4-A876-339553FFE181}.png",
-    "电气硬件-知识/电路基础(Circuit Theory)/第二部分：电子元件/assets/1. Capacitors",
-    "电气硬件-知识/电路基础(Circuit Theory)/第二部分：电子元件/assets",
-    "电气硬件-知识/电路基础(Circuit Theory)/第二部分：电子元件",
-    "电气硬件-知识/电路基础(Circuit Theory)/第一部分：电路基础定理/assets/2.电压源-电流源",
-    "电气硬件-知识/电路基础(Circuit Theory)/第一部分：电路基础定理/assets/1. 电学量",
-    "电气硬件-知识/电路基础(Circuit Theory)/第一部分：电路基础定理/assets"
+    "assets/TIM的基础理解/{9E28DEBB-7B96-452D-B6AA-3DC7F911D49A}.png",
+    "assets/TIM的基础理解/{FAE41EAA-D702-4F68-A81B-2D5ACD0AB58D}.png",
+    "assets/TIM的基础理解/{2F187FF0-8421-4056-8F97-0077A4F6DEB1}.png",
+    "assets/TIM的基础理解/{BDFB7C95-E64E-48E3-8B64-3F625D1A625C}.png",
+    "assets/TIM的基础理解/{A69ECF73-000D-49A2-9CC5-F7F609D69F65}.png",
+    "assets/TIM的基础理解/{ADFE672F-2BBD-4B2A-9D65-7478E0DD4D51}.png",
+    "assets/TIM的基础理解/{31DC8EA3-2390-4CD4-8DBF-AFAF860AE20E}.png",
+    "assets/TIM的基础理解/{51611B66-A9C2-4248-9C41-064341D0806A}.png",
+    "assets/TIM的基础理解/{B37C1F51-4CBB-468C-8770-E0FB1A09A3CA}.png",
+    "assets/TIM的基础理解/{DE9790D0-ED8C-4031-8A7A-EF8B3DB356C7}.png",
+    "assets/TIM的基础理解/{B6FF3D9A-5F0D-4CCD-B510-79D79E78B43D}.png",
+    "assets/TIM的基础理解",
+    "assets",
+    "嵌入式/操作库/STM-HAL库/TIM（定时器）.md",
+    "TIM的基础理解.md",
+    "源码阅读/RT-thread源码阅读/0.Document-阅读.md",
+    "嵌入式/操作系统与内核/进程-线程-协程的理解.md",
+    "嵌入式/操作系统与内核/上下文切换.md",
+    "嵌入式/操作系统与内核/进程调度算法.md",
+    "嵌入式/操作系统与内核/FreeRTOS/ITC/信号量.md",
+    "嵌入式/操作系统与内核/FreeRTOS/ITC/锁与并发保护机制.md",
+    "嵌入式/操作系统与内核/FreeRTOS/ITC/事件组.md",
+    "嵌入式/操作系统与内核/FreeRTOS/ITC/任务状态机.md",
+    "嵌入式/操作系统与内核/FreeRTOS/ITC/任务通知.md",
+    "嵌入式/操作系统与内核/FreeRTOS/ITC/临界区.md",
+    "嵌入式/操作系统与内核/FreeRTOS/ITC/队列.md",
+    "嵌入式/操作系统与内核/FreeRTOS/ITC/1.任务间通信与同步机制（ITC）.md",
+    "嵌入式/操作系统与内核/FreeRTOS/内存管理/实时操作系统里对内存调用的处理.md",
+    "嵌入式/操作系统与内核/FreeRTOS/内存管理/内存管理_OOM与MallocFailedHook.md",
+    "嵌入式/操作系统与内核/FreeRTOS/内存管理/内存管理_Heap策略与选型.md",
+    "嵌入式/操作系统与内核/FreeRTOS/内存管理/内存管理_隐性开销_FPU与RunTimeStats.md",
+    "嵌入式/操作系统与内核/FreeRTOS/内存管理/内存管理_异构内存与任意堆.md",
+    "嵌入式/操作系统与内核/FreeRTOS/内存管理/内存管理_任务栈与溢出防护.md",
+    "嵌入式/操作系统与内核/FreeRTOS/内存管理/内存管理_概览.md",
+    "嵌入式/操作系统与内核/FreeRTOS/内存管理/内存管理_动态分配生命周期与Idle回收.md",
+    "嵌入式/硬件与芯片/外设/中断的基础理解.md",
+    "嵌入式/操作库/STM-HAL库/中断(NVIC).md",
+    "嵌入式/硬件与芯片/中断的基础理解.md",
+    "嵌入式/操作库/STM-HAL库/assets/中断(NVIC)",
+    "嵌入式/操作库/STM-HAL库/assets/SPI",
+    "算法-Leetcode/位的操作",
+    "嵌入式/操作库/STM-HAL库/assets/时钟系统",
+    "嵌入式/硬件与芯片/内存",
+    "嵌入式/硬件与芯片/开发板",
+    "嵌入式/操作库/STM-HAL库/assets/I2C",
+    "嵌入式/操作库/STM-HAL库/assets/UART"
   ]
 }

@@ -27,7 +27,7 @@ Cortex-M4 采用**哈佛架构**，物理上分离了三条独立总线：
 
 | 总线 | 连接目标 | 职责 |
 | ---- | ---- | ---- |
-| I-Code 总线 | [[Flash]] (0x0800 0000) | 专用于取指令 |
+| I-Code 总线 | [[../内存/Flash]] (0x0800 0000) | 专用于取指令 |
 | D-Code 总线 | Flash + [[SRAM]] | 读写常量与变量 |
 | System 总线 | 外设寄存器 | 访问 GPIO、USART 等 |
 
@@ -282,7 +282,7 @@ GPIOA->ODR |= (1 << 5);
 
 **相关概念**：
 [STM32F407启动源码的理解](../STM32F407启动源码的理解.md):
-[STM32F407ZGT6的](STM32F407ZGT6的.md):
+[STM32F407ZGT6](../开发板/STM32F407ZGT6.md):
 [STM32-RTOS的接入问题](../../操作系统与内核/FreeRTOS/STM32-RTOS的接入问题.md)
 [详细介绍一下_HardFault@20260305_000623](../../../copilot/copilot-conversations/详细介绍一下_HardFault@20260305_000623.md)
 [Xtensa LX6 双核架构](Xtensa%20LX6%20双核架构.md)
