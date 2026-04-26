@@ -5,8 +5,6 @@ tags:
   - embedded
   - bare-metal
 chip: Generic
-module: FSMC
-language: C
 status: 🟢进行中
 ---
 

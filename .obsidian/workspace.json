@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "嵌入式/操作库/STM-HAL库/ADC.md",
+                "file": "嵌入式/通信/传输层/1. UART的基础理解.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -28,10 +28,83 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "ADC"
+              "title": "1. UART的基础理解"
+            }
+          },
+          {
+            "id": "e73d2af4efb33b57",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "嵌入式/通信/协议层/Modbus协议.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "Modbus协议"
+            }
+          },
+          {
+            "id": "9cb312aba9788bc5",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "嵌入式/硬件与芯片/内存/STM32F407启动源码的理解.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "STM32F407启动源码的理解"
+            }
+          },
+          {
+            "id": "75f5e856f9062fa4",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "嵌入式/硬件与芯片/内存/寄存器的大体认知.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "寄存器的大体认知"
             }
           }
-        ]
+        ],
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -63,7 +136,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "",
+                "query": "[\"tags\"]",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -88,7 +161,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 256.5
+    "width": 262.5
   },
   "right": {
     "id": "dd2d87647441e510",
@@ -104,7 +177,7 @@
             "state": {
               "type": "backlink",
               "state": {
-                "file": "优先级翻转.md",
+                "file": "嵌入式/语言/C/工程/幂等保护.md",
                 "collapseAll": false,
                 "extraContext": true,
                 "sortOrder": "alphabetical",
@@ -114,7 +187,7 @@
                 "unlinkedCollapsed": false
               },
               "icon": "links-coming-in",
-              "title": "优先级翻转 的反向链接列表"
+              "title": "幂等保护 的反向链接列表"
             }
           },
           {
@@ -137,9 +210,9 @@
             "state": {
               "type": "tag",
               "state": {
-                "sortOrder": "frequency",
+                "sortOrder": "alphabetical",
                 "useHierarchy": true,
-                "showSearch": false,
+                "showSearch": true,
                 "searchQuery": ""
               },
               "icon": "lucide-tags",
@@ -166,13 +239,13 @@
             "state": {
               "type": "outline",
               "state": {
-                "file": "优先级翻转.md",
+                "file": "嵌入式/语言/C/工程/幂等保护.md",
                 "followCursor": false,
                 "showSearch": false,
                 "searchQuery": ""
               },
               "icon": "lucide-list",
-              "title": "优先级翻转 的大纲"
+              "title": "幂等保护 的大纲"
             }
           },
           {
@@ -191,10 +264,10 @@
             "state": {
               "type": "file-properties",
               "state": {
-                "file": "优先级翻转.md"
+                "file": "嵌入式/语言/C/工程/幂等保护.md"
               },
               "icon": "lucide-info",
-              "title": "优先级翻转的笔记属性"
+              "title": "幂等保护的笔记属性"
             }
           }
         ],
@@ -202,8 +275,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 408.5,
-    "collapsed": true
+    "width": 409.5
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -219,53 +291,55 @@
       "copilot:Open Copilot Chat": false
     }
   },
-  "active": "3847ea54b0e476e0",
+  "active": "9cb312aba9788bc5",
   "lastOpenFiles": [
+    "源码阅读/RT-thread源码阅读-v2/91-工程源码索引.md",
+    "源码阅读/RT-thread源码阅读-v2/90-面试问题卡片.md",
+    "源码阅读/RT-thread源码阅读-v2/07-内存管理.md",
+    "源码阅读/RT-thread源码阅读-v2/06-IPC.md",
+    "源码阅读/RT-thread源码阅读-v2/05-中断-Tick-定时器.md",
+    "源码阅读/RT-thread源码阅读-v2/04-调度器.md",
+    "源码阅读/RT-thread源码阅读-v2/03-线程模型.md",
+    "源码阅读/RT-thread源码阅读-v2/02-对象系统.md",
+    "源码阅读/RT-thread源码阅读-v2/01-启动链路.md",
+    "源码阅读/RT-thread源码阅读-v2/00-总览地图.md",
+    "源码阅读/RT-thread源码阅读-v2",
+    "嵌入式/硬件与芯片/内存/MMU(内存管理单元).md",
+    "嵌入式/硬件与芯片/内存/存储器总体认知.md",
+    "嵌入式/硬件与芯片/内存/寄存器的大体认知.md",
+    "嵌入式/硬件与芯片/内存/DMA 与 Cache 一致性.md",
+    "嵌入式/硬件与芯片/内存/STM32F407启动源码的理解.md",
+    "嵌入式/语言/C/函数/Voliate函数.md",
+    "嵌入式/语言/C/函数/Malloc-Free函数.md",
+    "嵌入式/语言/C/函数/Hook函数设计.md",
+    "嵌入式/语言/C/工程/C语言的继承和多态.md",
+    "嵌入式/语言/C/工程/幂等保护.md",
+    "嵌入式/语言/C/工程/工程常识.md",
+    "嵌入式/语言/汇编/汇编常见参数.md",
+    "嵌入式/语言/C/工程/C(编译性语言)的编译过程.md",
+    "嵌入式/操作库/STM-HAL库/总览.md",
+    "嵌入式/操作库/STM-HAL库/ADC.md",
     "嵌入式/操作库/STM-HAL库/GPIO.md",
-    "嵌入式/操作库/STM-HAL库/I2C.md",
-    "嵌入式/操作库/STM-HAL库/UART.md",
-    "嵌入式/操作库/STM-HAL库/TIM（定时器）.md",
-    "源码阅读/RT-thread源码阅读/0.Document-阅读.md",
-    "嵌入式/硬件与芯片/外设/ADC模块初步理解.md",
-    "嵌入式/硬件与芯片/外设/TIM定时器基础概念.md",
+    "嵌入式/语言/汇编",
+    "嵌入式/语言/CPP",
+    "嵌入式/操作系统与内核/05_Linux",
+    "嵌入式/操作系统与内核/04_FreeRTOS/同步与通信",
+    "嵌入式/操作系统与内核/04_FreeRTOS/锁与并发保护",
+    "嵌入式/操作系统与内核/04_FreeRTOS/内存管理",
+    "嵌入式/操作系统与内核/04_FreeRTOS/任务管理",
+    "嵌入式/操作系统与内核/04_FreeRTOS",
+    "嵌入式/操作系统与内核/03_裸机架构模式",
+    "未命名 1.canvas",
+    "未命名.canvas",
+    "电气硬件-知识/电路基础(Circuit Theory)/第二部分：电子元件/assets/2.RC电路/{986D322D-8B59-430F-AD57-959D86A64570}.png",
+    "电气硬件-知识/电路基础(Circuit Theory)/第二部分：电子元件/assets/2.RC电路/8d50518976c8f843b3e9e8b4a6c3630e.jpg",
+    "电气硬件-知识/电路基础(Circuit Theory)/第二部分：电子元件/assets/2.RC电路/{B1062557-6609-4126-88DC-BFC4437A58E8}.png",
     "嵌入式/硬件与芯片/外设/assets/ADC模块初步理解/{3B8FEFBF-61E1-4CB1-A564-A30446E1DBA5}.png",
     "嵌入式/硬件与芯片/外设/assets/ADC模块初步理解/{D889C07C-5951-4A4F-B730-341F7D2E6D42}.png",
     "嵌入式/硬件与芯片/外设/assets/ADC模块初步理解/{92256DDD-94E5-4496-99A6-B15DAEF11C3F}.png",
     "嵌入式/硬件与芯片/外设/assets/ADC模块初步理解/{8274A189-8929-4FFD-84C7-8268092D7BD3}.png",
     "嵌入式/硬件与芯片/外设/assets/ADC模块初步理解/{3074376F-04F0-42DD-8DF6-29F14EA1A0A6}.png",
     "嵌入式/硬件与芯片/外设/assets/ADC模块初步理解/{5F02408E-26A9-43B9-8206-46B6A01C6BCB}.png",
-    "嵌入式/硬件与芯片/外设/assets/ADC模块初步理解/STM32-HAL库-ADC-模块的基本原理，最佳教程，没有之一-_哔哩哔哩_bilibili-04-24-2026_06_21_PM.jpg",
-    "嵌入式/硬件与芯片/外设/assets/ADC模块初步理解/file-20260424175339733.png",
-    "嵌入式/硬件与芯片/外设/assets/ADC模块初步理解/{E358C55F-2936-4546-A98B-F751D97B6C31}.png",
-    "嵌入式/硬件与芯片/外设/assets/ADC模块初步理解/{245EBAE2-C3AD-4A01-96BC-78B02159CA47}.png",
-    "嵌入式/硬件与芯片/外设/assets/ADC模块初步理解",
-    "嵌入式/硬件与芯片/外设/assets",
-    "嵌入式/操作库/STM-HAL库/ADC.md",
-    "嵌入式/硬件与芯片/外设/FSMC（内存扩展）的实现.md",
-    "嵌入式/硬件与芯片/外设/DMA(直接存储器访问).md",
-    "嵌入式/硬件与芯片/外设/中断的基础理解.md",
-    "嵌入式/操作库/STM-HAL库/中断(NVIC).md",
-    "TIM的基础理解.md",
-    "嵌入式/操作库/STM-HAL库/时钟系统.md",
-    "算法/嵌入式实战/1.清除操作.md",
-    "算法/嵌入式实战/4.Ring Buffer 与掩码取模.md",
-    "算法/Leetcode/Easy/191-位 1 的个数 -汉明重量.md",
-    "算法/Leetcode/Easy/2的幂.md",
-    "算法/嵌入式实战/3.端序转换.md",
-    "算法/嵌入式实战/2.提取操作.md",
-    "算法/Leetcode",
-    "电气硬件-知识/电路基础(Circuit Theory)/第二部分：电子元件/2.RC电路.md",
-    "电气硬件-知识/电路基础(Circuit Theory)/第二部分：电子元件/assets/2.RC电路",
-    "assets/TIM的基础理解",
-    "assets",
-    "嵌入式/操作系统与内核/进程-线程-协程的理解.md",
-    "嵌入式/操作系统与内核/上下文切换.md",
-    "嵌入式/操作系统与内核/进程调度算法.md",
-    "嵌入式/操作系统与内核/FreeRTOS/ITC/信号量.md",
-    "嵌入式/操作系统与内核/FreeRTOS/ITC/锁与并发保护机制.md",
-    "嵌入式/操作库/STM-HAL库/assets/中断(NVIC)",
-    "嵌入式/操作库/STM-HAL库/assets/SPI",
-    "算法/嵌入式实战",
-    "嵌入式/操作库/STM-HAL库/assets/时钟系统"
+    "嵌入式/硬件与芯片/外设/assets/ADC模块初步理解/STM32-HAL库-ADC-模块的基本原理，最佳教程，没有之一-_哔哩哔哩_bilibili-04-24-2026_06_21_PM.jpg"
   ]
 }

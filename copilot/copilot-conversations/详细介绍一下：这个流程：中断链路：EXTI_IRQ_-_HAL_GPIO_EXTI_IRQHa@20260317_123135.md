@@ -1,10 +1,4 @@
 ---
-epoch: 1773721895930
-modelKey: "GLM-5|3rd party (openai-format)"
-topic: "STM32 EXTI Interrupt Flow"
-
-
-
 tags:
   - copilot-conversation
 ---

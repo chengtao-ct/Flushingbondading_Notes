@@ -7,7 +7,6 @@ tags:
 aliases:
   - General Purpose Input Output
   - 通用输入输出
-module: GPIO
 related:
   - "[[外部中断EXTI]]"
   - "[[ADC]]"

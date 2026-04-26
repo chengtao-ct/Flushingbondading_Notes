@@ -1,5 +1,4 @@
 ---
-title: ARM Cortex-M4
 aliases:
   - Cortex-M4
   - M4内核
@@ -281,7 +280,7 @@ GPIOA->ODR |= (1 << 5);
 ## 🔗 知识拓扑
 
 **相关概念**：
-[STM32F407启动源码的理解](../STM32F407启动源码的理解.md):
+[STM32F407启动源码的理解](../内存/STM32F407启动源码的理解.md):
 [STM32F407ZGT6](../开发板/STM32F407ZGT6.md):
 [STM32-RTOS的接入问题](../../操作系统与内核/FreeRTOS/STM32-RTOS的接入问题.md)
 [详细介绍一下_HardFault@20260305_000623](../../../copilot/copilot-conversations/详细介绍一下_HardFault@20260305_000623.md)

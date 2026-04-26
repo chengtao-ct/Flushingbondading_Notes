@@ -11,7 +11,6 @@ aliases:
   - ADC HAL
   - STM32 ADC
   - STM32 HAL ADC
-module: ADC
 related:
   - "[[ADC模块初步理解]]"
   - "[[TIM（定时器）]]"

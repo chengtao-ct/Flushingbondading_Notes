@@ -1,9 +1,9 @@
 ---
 copilot-command-context-menu-enabled: true
 copilot-command-slash-enabled: true
-copilot-command-context-menu-order: 1150
+copilot-command-context-menu-order: 10
 copilot-command-model-key: ""
-copilot-command-last-used: 1772032842629
+copilot-command-last-used: 0
 ---
 你是一个资深的 AI 领域开发者和技术博主。请基于以下视频字幕，为我提取并整理一份结构清晰、高信息密度的 Markdown 学习笔记。
 

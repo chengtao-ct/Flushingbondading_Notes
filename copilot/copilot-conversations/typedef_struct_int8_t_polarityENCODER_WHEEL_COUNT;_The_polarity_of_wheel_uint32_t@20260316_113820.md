@@ -1,10 +1,4 @@
 ---
-epoch: 1773632300992
-modelKey: "GLM-5|3rd party (openai-format)"
-topic: "Encoder Wheel Configuration Struct"
-
-
-
 tags:
   - copilot-conversation
 ---

@@ -3,13 +3,10 @@ tags:
   - STM32
   - HAL库
   - I2C
-  - IIC
-  - 嵌入式
 aliases:
   - Inter-Integrated Circuit
   - IIC
   - 两线制总线
-module: I2C
 related:
   - "[[GPIO]]"
   - "[[UART]]"
@@ -17,7 +14,7 @@ related:
   - "[[DMA详解]]"
   - "[[外部中断EXTI]]"
   - "[[时钟树详解]]"
-  - "[[2.I2C的基础理解]]"
+  - "[[../../通信/传输层/2.I2C的基础理解]]"
   - "[[HAL库设计思想]]"
 ---
 
@@ -31,7 +28,7 @@ I2C 是 MCU 与传感器、EEPROM 等外设通信最常用的总线之一。HAL 
 > "I2C 在 HAL 库中主要用 `Mem_Write`/`Mem_Read` 进行寄存器级别的读写，实际项目基本用轮询方式因为数据量小。F1 系列有 I2C silicon bug 建议用软件 I2C，F4 及以后用硬件 I2C。"
 
 > [!tip] 前置知识
-> I2C 协议层原理（地址寻址、ACK/NACK、线与仲裁、开漏输出）详见 [[2.I2C的基础理解]]
+> I2C 协议层原理（地址寻址、ACK/NACK、线与仲裁、开漏输出）详见 [[../../通信/传输层/2.I2C的基础理解]]
 
 ---
 
@@ -106,6 +103,8 @@ HAL_StatusTypeDef HAL_I2C_Mem_Read(
     uint32_t Timeout
 );
 ```
+
+先找设备（从机地址），再找寄存器（寄存器地址）。 0xD0/0xD1 是"门牌号"，0x1A 是"房间号
 
 ```c
 // 例：读 MPU6050 的加速度 X（寄存器 0x3B，连续 2 字节）

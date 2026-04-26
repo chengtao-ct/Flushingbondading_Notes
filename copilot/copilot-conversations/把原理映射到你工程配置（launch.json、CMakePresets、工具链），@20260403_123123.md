@@ -1,10 +1,4 @@
 ---
-epoch: 1775190683281
-modelKey: "GLM-5|3rd party (openai-format)"
-topic: "原理映射工程配置实战"
-
-
-
 tags:
   - copilot-conversation
 ---

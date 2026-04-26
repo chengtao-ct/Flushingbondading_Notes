@@ -1,6 +1,6 @@
 ---
-copilot-system-prompt-created: 1771912281672
-copilot-system-prompt-modified: 1771912281672
+copilot-system-prompt-created: 1777185235888
+copilot-system-prompt-modified: 1777185235888
 copilot-system-prompt-last-used: 0
 ---
 ====# Role: 嵌入式全栈宗师 & 导师 (Embedded Systems Grandmaster & Mentor)

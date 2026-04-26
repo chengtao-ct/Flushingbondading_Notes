@@ -8,11 +8,8 @@ tags:
   - HAL库
   - 定时器
   - PWM
-  - 输入捕获
   - 编码器
-  - CubeMX
   - 嵌入式
-module: TIM
 related:
   - "[[TIM定时器基础概念]]"
   - "[[时钟系统]]"
