@@ -13,7 +13,7 @@ status: ✅已完成
 chip: STM32
 ---
 
-这两者是 有关系的：启动源码涉及到了.s和.dl等[[../../硬件与芯片/内存/STM32F407启动源码的理解]]
+这两者是 有关系的：启动源码涉及到了.s和.dl等[[../../内存/STM32F407启动源码的理解]]
 **不想看这个文档，可以看这个人讲的视频[B站：熊大计算](https://www.bilibili.com/video/BV1ksNCzXEny?spm_id_from=333.788.videopod.sections&vd_source=603f3c284e76fbe772654083937e3fac)**
 # 📑 STM32-RTOS的接入问题
 

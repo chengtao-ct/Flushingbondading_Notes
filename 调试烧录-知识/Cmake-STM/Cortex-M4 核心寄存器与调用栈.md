@@ -643,7 +643,7 @@ void HardFault_Handler(void) {
 
 ## 🔗 知识延伸
 
-- ⬆️ **上位知识**：[ARM Cortx-M4](../../嵌入式/硬件与芯片/芯片/ARM%20Cortx-M4.md)/ [[嵌入式调试原理]]
+- ⬆️ **上位知识**：[ARM Cortx-M4](../../嵌入式/芯片/MCU/ARM%20Cortx-M4.md)/ [[嵌入式调试原理]]
 - ⬇️ **下位知识**：[[HardFault 排查实战]] / [[GDB 调试命令大全]]
 - ➡️ **平级关联**：[[RTOS 任务栈分析]] / [调试全景数据流](调试全景数据流.md)
 - [在这个背景下讲述Cortex-M4_核心寄存器与调用栈（PCLRSP、函数@20260402_233357](../../copilot/copilot-conversations/在这个背景下讲述Cortex-M4_核心寄存器与调用栈（PCLRSP、函数@20260402_233357.md)

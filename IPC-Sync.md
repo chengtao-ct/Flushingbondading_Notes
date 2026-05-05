@@ -1,0 +1,2571 @@
+
+
+## 公共等待队列骨架
+
+
+### 本质作用：
+
+**IPC（进程间通信/同步）模块**与 **底层调度器** 的核心桥梁
+
+
+**分为三类，一个是创建，一个队列的进出，最后一个是唤醒所有挂起态的信号**
+
+`_ipc_object_init`
+
+- 很简单的逻辑，初始化
+- 
+这段代码**绝对不是**在初始化一个具体的线程，而是为当前的 IPC 对象（如信号量、消息队列）建造一个“空的候车室（等待队列）”。它将一个双向链表初始化为空，用来在未来存放那些因为拿不到资源而被挂起等待的线程
+
+```c
+rt_inline rt_err_t _ipc_object_init(struct rt_ipc_object *ipc)
+
+{
+
+    /* initialize ipc object */
+
+    rt_list_init(&(ipc->suspend_thread));
+
+  
+
+    return RT_EOK;
+
+}
+```
+
+`rt_susp_list_enqueue` 和 `rt_susp_list_dequeue`
+
+
+
+- 入队的排队策略
+
+这两个函数是 RT-Thread IPC 模块的**“排队管家”**：`rt_susp_list_enqueue` 负责让获取不到资源的线程按照特定规则（排队或插队）进入睡眠等待队列；`rt_susp_list_dequeue` 负责在资源释放时，从队伍中唤醒排在最前面的线程，并交由调度器重新运行。
+
+
+
+```c
+/**
+ * @brief   Dequeue a thread from suspended list and set it to ready.
+ * （从挂起链表中取出一个线程并让它准备运行）
+ */
+struct rt_thread *rt_susp_list_dequeue(rt_list_t *susp_list, rt_err_t thread_error)
+{
+    rt_sched_lock_level_t slvl;
+    rt_thread_t thread;
+    rt_err_t error;
+
+    // [架构师注释 1：防御性编程] 确保当前调度器没有被锁死，并且传入的链表不是空指针
+    RT_SCHED_DEBUG_IS_UNLOCKED;
+    RT_ASSERT(susp_list != RT_NULL);
+
+    // [架构师注释 2：关中断/上锁] 保护临界区！因为接下来要操作全局的链表结构，
+    // 绝不能在这时被硬件中断或其他核心（如果是SMP）打断，否则链表指针会错乱引发HardFault。
+    rt_sched_lock(&slvl); 
+    
+    if (!rt_list_isempty(susp_list))
+    {
+        // [架构师注释 3：神仙宏定义] susp_list->next 指向的是等待队列里的第一个“链表节点”。
+        // RT_THREAD_LIST_NODE_ENTRY 宏的底层其实是经典的 container_of 原理。
+        // 它能通过链表节点的内存地址，反向推算出包含这个节点的 rt_thread 结构体的首地址！
+        thread = RT_THREAD_LIST_NODE_ENTRY(susp_list->next);
+        
+        // [架构师注释 4：核心调度动作] 把这个线程从挂起状态变成就绪状态 (Ready)。
+        // 这一步内部会把它从 susp_list 拔下来，插回到系统的“就绪队列”中。
+        error = rt_sched_thread_ready(thread);
+
+        if (error)
+        {
+            LOG_D("%s [error:%d] failed to resume thread:%p from suspended list",
+                  __func__, error, thread);
+            thread = RT_NULL;
+        }
+        else
+        {
+            // [架构师注释 5：传递唤醒原因] 告诉被唤醒的线程：“你是怎么醒的？”
+            // 比如是因为等到了资源醒的 (RT_EOK)，还是因为等超时了被定时器强行叫醒的 (-RT_ETIMEOUT)。
+            if (thread_error >= 0)
+            {
+                thread->error = thread_error;
+            }
+        }
+    }
+    else
+    {
+        thread = RT_NULL; // 队伍里没人
+    }
+    
+    // [架构师注释 6：开锁] 操作完毕，恢复之前的锁状态/开启中断。
+    rt_sched_unlock(slvl);
+
+    LOG_D("resume thread:%s\n", thread->parent.name);
+
+    return thread; // 返回被唤醒的线程控制块指针
+}
+
+/**
+ * @brief   Add a thread to the suspend list
+ * （把一个线程加入到挂起链表中）
+ */
+rt_err_t rt_susp_list_enqueue(rt_list_t *susp_list, rt_thread_t thread, int ipc_flags)
+{
+    // [架构师注释 7：断言保护] 调用这个函数之前，上层函数必须已经把调度器锁住了！
+    RT_SCHED_DEBUG_IS_LOCKED;
+
+    // [架构师注释 8：排队策略分发] 判断创建这个 IPC 对象（如信号量）时，用户指定的排队规则是什么？
+    switch (ipc_flags)
+    {
+    case RT_IPC_FLAG_FIFO:
+        // [架构师注释 9：FIFO 先进先出规则] 
+        // rt_list_insert_before 是双向循环链表操作。插在头节点 (susp_list) 的前面，
+        // 在环形链表里，其实就是插到了整个队列的最后面（队尾）！也就是老老实实排队。
+        rt_list_insert_before(susp_list, &RT_THREAD_LIST_NODE(thread));
+        break; /* RT_IPC_FLAG_FIFO */
+
+    case RT_IPC_FLAG_PRIO:
+        {
+            struct rt_list_node *n;
+            struct rt_thread *sthread;
+
+            // [架构师注释 10：PRIO 优先级插队规则]
+            // 遍历当前队伍里的每一个人（每一个挂起的线程）
+            for (n = susp_list->next; n != susp_list; n = n->next)
+            {
+                sthread = RT_THREAD_LIST_NODE_ENTRY(n);
+
+                // [架构师注意：数字越小，优先级越高！]
+                // 如果当前正在排队的线程 (thread) 的优先级比队伍里的某个人 (sthread) 高（数字小），
+                // 那么就不往后找了！
+                if (rt_sched_thread_get_curr_prio(thread) < rt_sched_thread_get_curr_prio(sthread))
+                {
+                    // [架构师注释 11：VIP 插队] 把自己插在这个优先级比自己低的人的前面。
+                    rt_list_insert_before(&RT_THREAD_LIST_NODE(sthread), &RT_THREAD_LIST_NODE(thread));
+                    break;
+                }
+            }
+
+            // [架构师注释 12：兜底逻辑] 
+            // 如果 n 遍历到了 susp_list，说明队伍里所有人的优先级都比我高，或者和我一样。
+            // 那么我也只能乖乖排到队尾去。
+            if (n == susp_list)
+                rt_list_insert_before(susp_list, &RT_THREAD_LIST_NODE(thread));
+        }
+        break;/* RT_IPC_FLAG_PRIO */
+
+    default:
+        RT_ASSERT(0);
+        break;
+    }
+
+    return RT_EOK;
+}
+```
+
+
+
+`rt_susp_list_resume_all ` 和 `rt_susp_list_resume_all_irq`
+
+
+这两个函数是 IPC 模块的“强制清场员”**：当一个 IPC 对象（如信号量、消息队列）被强制删除 (Delete) 或重置 (Reset) 时，它们负责把挂在这个对象“候车室”里的**所有线程全部唤醒，防止这些线程因为等一个不存在的资源而“死锁（永久睡眠）”。
+
+```c
+
+/**
+ * @brief   普通清场：唤醒挂起链表上的所有线程
+ */
+rt_err_t rt_susp_list_resume_all(rt_list_t *susp_list, rt_err_t thread_error)
+{
+    struct rt_thread *thread;
+
+    // [架构师注释 1：环境校验] 确保当前调度器没有被锁住。因为唤醒大量线程可能会
+    // 导致当前正在执行的线程被抢占，如果调度器锁死了，这种抢占就无法发生。
+    RT_SCHED_DEBUG_IS_UNLOCKED;
+
+    /* wakeup all suspended threads */
+    // [架构师注释 2：首次尝试提取] 调用我们之前学过的 dequeue 函数，拔出排在最前面的线程。
+    thread = rt_susp_list_dequeue(susp_list, thread_error);
+    
+    // [架构师注释 3：只要队伍里还有人，就一直拔]
+    while (thread)
+    {
+        /*
+         * resume NEXT thread
+         * In rt_thread_resume function, it will remove current thread from
+         * suspended list
+         */
+        // 重点：rt_susp_list_dequeue 内部会自动把线程从 susp_list 上摘下来。
+        // 所以下一次循环再调用时，取到的就是原来排在第二位、现在变成第一位的线程。
+        thread = rt_susp_list_dequeue(susp_list, thread_error);
+    }
+
+    return RT_EOK;
+}
+
+/**
+ * @brief   带中断/自旋锁保护的清场：安全唤醒所有线程
+ */
+rt_err_t rt_susp_list_resume_all_irq(rt_list_t *susp_list,
+                                     rt_err_t thread_error,
+                                     struct rt_spinlock *lock)
+{
+    struct rt_thread *thread;
+    rt_base_t level;
+
+    RT_SCHED_DEBUG_IS_UNLOCKED;
+
+    // [架构师注释 4：细粒度锁设计（极其精妙！）]
+    do
+    {
+        // [架构师注释 5：关中断 / 上自旋锁] 
+        // 保护这个 IPC 对象的私有锁。防止在拔节点的时候，其他 CPU 核心或硬件中断也在修改这个链表。
+        level = rt_spin_lock_irqsave(lock);
+
+        /*
+         * resume NEXT thread
+         */
+        // 拔出一个线程
+        thread = rt_susp_list_dequeue(susp_list, thread_error);
+
+        // [架构师注释 6：开中断 / 解锁]
+        rt_spin_unlock_irqrestore(lock, level);
+        
+        // 【思考：为什么不在 do-while 循环外面加锁？而要在循环里面频繁加锁解锁？】
+        // 答案见下文的“OS 原理深度解析”！
+        
+    }
+    while (thread); // 如果刚才拔出的线程不为空（说明还有人），继续下一轮循环
+
+    return RT_EOK;
+}
+```
+
+
+
+- **实时性的底线：** RTOS 的核心是“实时性”。如果一个高级定时器中断（比如无刷电机换相，要求 10 微秒内必须响应）触发了，但此时 CPU 刚好执行到了刚才那个**反面教材代码**中。
+    
+- **灾难发生：** 因为外层循环关了中断，CPU 必须一口气把这 100 个线程全部唤醒。这可能需要好几十微秒。在这几十微秒内，电机换相中断被**屏蔽**了！电机可能因此烧毁！
+    
+- **“锁呼吸（Lock Breathing）”机制：** RT-Thread 源码采用的做法是——每处理完**一个**线程，就**解一次锁，开一次中断**。 这就相当于在长跑中“喘一口气”。就在这解锁和重新上锁的微小间隙（可能只有几个 CPU 周期），如果刚好有紧急的硬件中断到来，CPU **立刻**就能去响应中断！等中断处理完，再回来接着唤醒下一个线程。
+    
+- **结论：** 牺牲了一丁点循环的总体执行效率，却换来了**极低、极稳定的最大中断延迟（Maximum Interrupt Latency）**。这是嵌入式底层内核极其经典的设计哲学！
+
+1. 无论你是信号量 (Semaphore)、互斥量 (Mutex)、还是消息队列 (Message Queue)，只要线程需要等待，底层统统复用这两个公共的 `dequeue` 和 `enqueue` 函数。这是一种极简的 C 语言面向对象继承机制的体现（所有的 IPC 对象基类里都包含一个 `susp_list` 链表）。
+
+
+
+
+
+### Semaphores
+
+[信号量](嵌入式/操作系统与内核/04_FreeRTOS/同步与通信/信号量.md)
+
+
+在这个例子中，管理员相当于信号量。管理员所负责的空停车位数量，就相当于信号量的值（非负数，且会动态变化）。停车位相当于共享资源，而汽车则相当于线程。汽车必须先获得管理员的许可才能使用停车位，这就好比线程必须先获取信号量才能使用共享资源。
+
+
+下图展示了信号量的示意图。每个信号量对象都包含一个信号量值以及一个等待队列。信号量值对应着该信号量对象的实际可用数量，也就是可用的资源数量。如果信号量值为 5，那就意味着有 5 个可用的信号量资源。如果信号量数量为零，那么申请该信号量的线程将会被挂起，等待队列中的其他线程释放出可用资源后才能继续执行。
+
+#### 信号量的创建和释放（init,create,detach,delete）
+
+- 我只写了静态的创建和释放，动态的就是比静态多了一个HEAP的分配
+
+`rt_sem_create` 和 `rt_sem_detach`
+
+
+```c
+#ifdef RT_USING_SEMAPHORE
+
+/**
+ * @brief 内部初始化函数：真正设置信号量属性的地方
+ */
+static void _sem_object_init(rt_sem_t       sem,
+                             rt_uint16_t    value,
+                             rt_uint8_t     flag,
+                             rt_uint16_t    max_value)
+{
+    /* initialize ipc object */
+    // [架构师注释 1：调用父类构造函数] 
+    // 记得我们上一轮学的 _ipc_object_init 吗？这里把 sem 强转为父类 ipc 对象，
+    // 调用它去初始化那个名为 suspend_thread 的“候车室（双向链表）”。
+    _ipc_object_init(&(sem->parent));
+
+    sem->max_value = max_value; // 最大计数值（防止溢出）
+    
+    /* set initial value */
+    // [架构师注释 2：赋初值] 这是信号量的核心灵魂。
+    // 如果是管理共享资源（比如 3 个缓冲区），value 就设为 3。
+    // 如果是做中断和线程的同步（等信号），value 通常设为 0。
+    sem->value = value;
+
+    /* set parent */
+    // [架构师注释 3：设置排队规则] 
+    // flag 就是我们之前说的 RT_IPC_FLAG_FIFO (排队) 或 RT_IPC_FLAG_PRIO (VIP插队)。
+    // 注意看这个极其经典的 C语言多重继承指针操作：
+    // sem -> 找它的父类(parent = rt_ipc_object) -> 再找爷爷类(parent = rt_object) -> 设置爷爷类的 flag。
+    sem->parent.parent.flag = flag;
+    
+    // [架构师注释 4：初始化私有自旋锁] 为这个信号量配置一把底层锁，保护它的 value 和 等待队列。
+    rt_spin_lock_init(&(sem->spinlock));
+}
+
+/**
+ * @brief 对外 API：初始化一个【静态】信号量
+ */
+rt_err_t rt_sem_init(rt_sem_t    sem,
+                     const char *name,
+                     rt_uint32_t value,
+                     rt_uint8_t  flag)
+{
+    // [架构师注释 5：防御性编程] 确保传入的指针非空，初始值没超限，排队规则合法。
+    RT_ASSERT(sem != RT_NULL);
+    RT_ASSERT(value < 0x10000U);
+    RT_ASSERT((flag == RT_IPC_FLAG_FIFO) || (flag == RT_IPC_FLAG_PRIO));
+
+    /* initialize object */
+    // [架构师注释 6：系统级对象注册]
+    // 这一步是向 RT-Thread 操作系统的“全局对象管理器”报备：
+    // “我这里有个静态对象，名字叫 name，类型是 Semaphore，请帮我挂到系统的静态对象链表里！”
+    rt_object_init(&(sem->parent.parent), RT_Object_Class_Semaphore, name);
+
+    // [架构师注释 7：本体初始化] 调用上面那个内部函数，设置计数值和候车室。
+    _sem_object_init(sem, value, flag, RT_SEM_VALUE_MAX);
+
+    return RT_EOK;
+}
+RTM_EXPORT(rt_sem_init);
+
+
+/**
+ * @brief 对外 API：脱离/销毁一个【静态】信号量
+ */
+rt_err_t rt_sem_detach(rt_sem_t sem)
+{
+    rt_base_t level;
+
+    /* parameter check */
+    // [架构师注释 8：严格的销毁前校验]
+    RT_ASSERT(sem != RT_NULL);
+    // 确认你传进来的确实是个信号量，别拿个互斥锁传进来！
+    RT_ASSERT(rt_object_get_type(&sem->parent.parent) == RT_Object_Class_Semaphore);
+    // 确认它真的是个“静态”对象（is_systemobject 本质是检查有没有 STATIC 的掩码位）
+    RT_ASSERT(rt_object_is_systemobject(&sem->parent.parent));
+
+    // [架构师注释 9：关中断上锁] 准备拆除操作，保护临界区！
+    level = rt_spin_lock_irqsave(&(sem->spinlock));
+    
+    /* wakeup all suspended threads */
+    // [架构师注释 10：暴力清场] 
+    // 经典回顾！调用上一轮我们学的 rt_susp_list_resume_all。
+    // 注意这里传入的第二个参数是 RT_ERROR（其实是个负数）。
+    // 意味着所有正在等这个信号量的线程会被强行叫醒，它们的取信号量函数会返回 -RT_ERROR。
+    // 这样上层应用就知道：“不是我拿到信号量了，而是信号量被人砸了！”
+    rt_susp_list_resume_all(&(sem->parent.suspend_thread), RT_ERROR);
+    
+    rt_spin_unlock_irqrestore(&(sem->spinlock), level);
+
+    /* detach semaphore object */
+    // [架构师注释 11：注销户口] 从 RT-Thread 的全局对象管理器链表中把它拔下来。
+    rt_object_detach(&(sem->parent.parent));
+
+    return RT_EOK;
+}
+RTM_EXPORT(rt_sem_detach);
+#endif
+```
+
+
+**C 语言极简的面向对象设计 (OOP in C)：** 在这段代码中，我们清晰地看到了 RT-Thread 的继承体系： `rt_object` (爷爷类，管对象名字和类型) -> `rt_ipc_object` (父类，管等待链表) -> `rt_semaphore` (子类，自己管 count value)。 当需要操作父类属性时，使用 `sem->parent.parent.flag = flag;`。这是一种用结构体嵌套来实现继承的极简魔法，没有 C++ `vtable` 的任何开销，非常适合资源受限的单片机。
+
+
+**清场遣散的艺术 (RT_ERROR 的意义)** 如果一个系统正在运行，有 3 个线程在苦苦等待 `my_sem` 信号量，突然另一个控制线程调用了 `rt_sem_detach`。如果不做清场直接注销对象，那这 3 个线程就成了“死锁的孤魂野鬼”，永远在等一个不再存在的资源。所以 `detach` 必须先锁住状态，使用 `-RT_ERROR` 把它们全唤醒，让业务代码有机会执行错误处理逻辑（如重置模块或报错）。
+
+
+
+#### 信号量调用函数
+
+这组函数是 IPC 模块的“检票口”：`_rt_sem_take` 负责检查是否有剩余的信号量（车位/门票），如果有就直接拿走运行；如果没有，就把当前线程按照设定的超时时间和打断规则（是否允许被强杀）挂起睡眠；其余的四个函数只是给这个核心函数套上了不同应用场景的“马甲（Wrapper）”。
+
+
+
+```c
+/**
+ * @brief 内部核心函数：获取信号量
+ * @param suspend_flag: 线程挂起时的抗打断等级（是否允许被 UNIX 信号打断/杀死）
+ */
+static rt_err_t _rt_sem_take(rt_sem_t sem, rt_int32_t timeout, int suspend_flag)
+{
+    rt_base_t level;
+    struct rt_thread *thread;
+    rt_err_t ret;
+
+    /* parameter check */
+    RT_ASSERT(sem != RT_NULL);
+    RT_ASSERT(rt_object_get_type(&sem->parent.parent) == RT_Object_Class_Semaphore);
+
+    // [架构师注释 1：Hook 机制] 留给用户的钩子函数，可以在试图获取信号量前执行自定义操作（如性能统计）
+    RT_OBJECT_HOOK_CALL(rt_object_trytake_hook, (&(sem->parent.parent)));
+
+    /* current context checking */
+    // [架构师注释 2：上下文生死校验！]
+    // 这是一个极其关键的宏。如果这个函数是在中断服务函数 (ISR) 里被调用的，
+    // 并且 timeout != 0 (意味着可能要睡眠等待)，系统会直接 Assert 报错死机！
+    // 永远记住：【中断上下文绝对不允许发生阻塞/睡眠】！
+    RT_DEBUG_SCHEDULER_AVAILABLE(1);
+
+    // [架构师注释 3：关中断/自旋锁] 保护信号量的 value 和等待队列不被并发破坏
+    level = rt_spin_lock_irqsave(&(sem->spinlock));
+
+    // ==============【分支 1：资源充足】==============
+    if (sem->value > 0)
+    {
+        /* semaphore is available */
+        sem->value --; // 拿走一张票
+        rt_spin_unlock_irqrestore(&(sem->spinlock), level); // 解锁，开溜！
+    }
+    // ==============【分支 2：资源耗尽，需要排队】==============
+    else
+    {
+        /* no waiting, return with timeout */
+        // [架构师注释 4：非阻塞尝试 (TryTake)]
+        if (timeout == 0)
+        {
+            rt_spin_unlock_irqrestore(&(sem->spinlock), level);
+            return -RT_ETIMEOUT; // 没票，且我不愿意等，直接返回超时错误码
+        }
+        else
+        {
+            /* semaphore is unavailable, push to suspend list */
+            thread = rt_thread_self(); // 获取当前正在执行的自己
+
+            // [架构师注释 5：预置唤醒原因]
+            // 先默认自己是被中断（如超时或强杀）唤醒的。
+            // 只有当别人真正调用 Release 释放信号量唤醒我时，才会把这个 error 改成 RT_EOK。
+            thread->error = RT_EINTR; 
+
+            /* suspend thread */
+            // [架构师注释 6：去候车室排队]
+            // 把自己挂入这个 sem 的等待链表里。内部逻辑就是咱们第一课学的 enqueue 函数！
+            ret = rt_thread_suspend_to_list(thread, &(sem->parent.suspend_thread),
+                                            sem->parent.parent.flag, suspend_flag);
+            if (ret != RT_EOK)
+            {
+                // 如果挂起失败（比如线程状态不对），直接解锁报错。
+                rt_spin_unlock_irqrestore(&(sem->spinlock), level);
+                return ret;
+            }
+
+            // [架构师注释 7：上个闹钟]
+            /* has waiting time, start thread timer */
+            if (timeout > 0)
+            {
+                rt_tick_t timeout_tick = timeout;
+                // 重置当前线程内置的定时器，并启动它。
+                // 如果在这段时间内没人给我发信号量，定时器中断就会强行把我叫醒。
+                rt_timer_control(&(thread->thread_timer),
+                                 RT_TIMER_CTRL_SET_TIME,
+                                 &timeout_tick);
+                rt_timer_start(&(thread->thread_timer));
+            }
+
+            /* enable interrupt */
+            rt_spin_unlock_irqrestore(&(sem->spinlock), level);
+
+            // [架构师注释 8：灵魂指令 —— 触发系统调度！！]
+            /* do schedule */
+            rt_schedule();
+
+            // ==========================================================
+            // 【时空断层】：当代码执行到上面这一行时，当前线程就休眠了！CPU 跑去执行别人了！
+            // 不知道过了多久，也许是拿到了信号量，也许是超时了。当前线程再次被 CPU 调度执行。
+            // 醒来后的第一句代码，就是下面这个 if 判断：
+            // ==========================================================
+
+            // [架构师注释 9：醒后验伤]
+            // 看看我的 error 码是多少？
+            // 是 RT_EOK 吗？太好了，说明是 rt_sem_release 把我正常唤醒的，我拿到了资源！
+            // 是 -RT_ETIMEOUT 吗？唉，说明是刚才上的闹钟响了把我叫醒的，我没拿到资源。
+            if (thread->error != RT_EOK)
+            {
+                return thread->error > 0 ? -thread->error : thread->error;
+            }
+        }
+    }
+
+    RT_OBJECT_HOOK_CALL(rt_object_take_hook, (&(sem->parent.parent)));
+
+    return RT_EOK;
+}
+```
+
+
+```c
+rt_err_t rt_sem_take(rt_sem_t sem, rt_int32_t time)
+{
+    // 传入 RT_UNINTERRUPTIBLE（不可中断）
+    // 逻辑：拿不到信号量就死死睡过去，除了等到资源或者定时器超时，外界哪怕天塌下来（发信号）也不醒。
+    return _rt_sem_take(sem, time, RT_UNINTERRUPTIBLE);
+}
+```
+
+
+```c
+rt_err_t rt_sem_take_interruptible(rt_sem_t sem, rt_int32_t time)
+{
+    // 传入 RT_INTERRUPTIBLE（可被 UNIX 信号中断）
+    // 逻辑：睡得比较“浅”。如果在等信号量的过程中，别的线程给它发了一个软信号（比如 POSIX 里的 SIGINT/Ctrl+C），它会立刻被惊醒，并返回 -RT_EINTR 错误。
+    return _rt_sem_take(sem, time, RT_INTERRUPTIBLE);
+}
+```
+
+
+```c
+rt_err_t rt_sem_take_killable(rt_sem_t sem, rt_int32_t time)
+{
+    // 传入 RT_KILLABLE（可被致死信号中断）
+    // 逻辑：比上一个睡得“深”一点。忽略普通的软信号，只有当收到致命信号（类似 Linux 的 kill -9）时才会被惊醒。
+    return _rt_sem_take(sem, time, RT_KILLABLE);
+}
+```
+
+```c
+rt_err_t rt_sem_trytake(rt_sem_t sem)
+{
+    // 传入 RT_WAITING_NO（宏定义，其值为 0）
+    // 逻辑：本质上还是调用的 rt_sem_take，但把 time 设为了 0。
+    // 如果走到 _rt_sem_take 的底层，一发现没票，且 time==0，直接 return -RT_ETIMEOUT，绝不排队挂起！
+    return rt_sem_take(sem, RT_WAITING_NO);
+}
+```
+
+
+你可能注意到了代码最后提供了四个马甲函数（`take`, `take_interruptible`, `take_killable`, `trytake`）。它们的核心区别在于传入的 `suspend_flag`：
+
+- **`RT_UNINTERRUPTIBLE` (不可中断 - 默认情况):** 线程在等信号量时睡得很死。哪怕外面有人给它发了类似 Linux `kill -9` 的强制杀死信号，它也绝对不醒，直到等到信号量或者超时。
+    
+- **`RT_INTERRUPTIBLE / RT_KILLABLE`:** 线程睡得比较“浅”。如果等待期间收到系统的致命信号（Signal），它可以被强行唤醒并立刻返回一个 `-RT_EINTR`（被中断）的错误，从而让上层代码有机会优雅地退出、释放内存。这是对现代 POSIX 兼容系统非常重要的高级特性。
+
+
+- 你会发现每个函数下面都跟着一句 `RTM_EXPORT(...)`。这是 RT-Thread 非常牛的一个特性。它告诉链接器：“把这个函数的地址和名字导出到一个特殊的常量表中”。这样，当你在串口终端（FinSH 命令行）输入这个函数名时，或者当你动态加载一个独立的 `.mo` 应用模块时，系统就能根据名字自动找到这个函数的物理地址并执行它！
+
+
+#### 信号释放函数
+
+`rt_sem_release`
+
+这个函数是 IPC 模块的“资源派发员”：当调用它时，如果“候车室”里有线程在排队，它会直接把资源交给排在第一位的线程并唤醒它抢占 CPU；如果没人排队，它就把信号量的计数值加 1（把票存起来）。
+
+```c
+/**
+ * @brief    释放一个信号量
+ */
+rt_err_t rt_sem_release(rt_sem_t sem)
+{
+    rt_base_t level;
+    rt_bool_t need_schedule;
+
+    /* parameter check */
+    RT_ASSERT(sem != RT_NULL);
+    RT_ASSERT(rt_object_get_type(&sem->parent.parent) == RT_Object_Class_Semaphore);
+
+    // [架构师注释 1：钩子函数] 允许用户在真正释放资源前做一些记录（如 trace 追踪）
+    RT_OBJECT_HOOK_CALL(rt_object_put_hook, (&(sem->parent.parent)));
+
+    // [架构师注释 2：延迟调度标志位] 
+    // 记住这个变量！默认设为 FALSE。它决定了我们在这个函数退出前，要不要触发一次系统调度。
+    need_schedule = RT_FALSE;
+
+    // [架构师注释 3：关中断/上自旋锁] 保护临界区，准备查验候车室。
+    level = rt_spin_lock_irqsave(&(sem->spinlock));
+
+    LOG_D("thread %s releases sem:%s, which value is: %d",
+          rt_thread_self()->parent.name,
+          sem->parent.parent.name,
+          sem->value);
+
+    // ==============【核心逻辑分叉】==============
+    if (!rt_list_isempty(&sem->parent.suspend_thread))
+    {
+        /* resume the suspended thread */
+        // [分支 A：有人排队！]
+        // 架构师注释 4：调用我们在第一课学的 dequeue 函数！
+        // 重点看第二个参数：RT_EOK。这就呼应了 take 函数里的“醒后验伤”。
+        // 我们把 RT_EOK 塞给那个正在睡觉的线程，告诉它：“哥们，醒醒，你拿到票了！”
+        rt_susp_list_dequeue(&(sem->parent.suspend_thread), RT_EOK);
+        
+        // 既然唤醒了一个线程，那么一会儿解锁后，必须检查一下它是不是比当前线程优先级更高。
+        need_schedule = RT_TRUE;
+        
+        // 【极其重要：你发现这里 sem->value 并没有执行 ++ 操作吗？原因见后文深度解析！】
+    }
+    else
+    {
+        // [分支 B：没人排队！]
+        if(sem->value < sem->max_value)
+        {
+            // 架构师注释 5：既然没人着急用，那我就把这张票存到票箱里。
+            sem->value ++; /* increase value */
+        }
+        else
+        {
+            // 架构师注释 6：溢出保护。如果票箱已经满了（比如上限只允许 10，现在已经是 10），
+            // 直接解锁并报错。防止粗心的程序员在中断里无限发信号量导致计数器回绕。
+            rt_spin_unlock_irqrestore(&(sem->spinlock), level);
+            return -RT_EFULL; /* value overflowed */
+        }
+    }
+
+    // [架构师注释 7：开中断/解自旋锁] 临界区安全结束。
+    rt_spin_unlock_irqrestore(&(sem->spinlock), level);
+
+    /* resume a thread, re-schedule */
+    // [架构师注释 8：执行真正的调度]
+    if (need_schedule == RT_TRUE)
+        rt_schedule();
+
+    return RT_EOK;
+}
+RTM_EXPORT(rt_sem_release);
+```
+
+- 在业务层写代码时，如果某个操作比较耗时，或者涉及到复杂的锁依赖（比如调度），不要在深层的、加了锁的 if-else 分支里直接调用。像内核源码一样，设一个 `bool` 标志位，统一在函数末尾、所有锁都释放的安全地带进行处理。这能极大地降低死锁的概率。
+
+
+
+#### 信号变量的重新控制
+
+`rt_sem_control`
+
+
+这个函数是信号量的“动态配置与重置中心”：它允许程序在运行时，不销毁信号量的前提下，暴力重置信号量的当前计数值（Reset），或者修改信号量的最大容量上限（Set Limit）。
+
+```c
+/**
+ * @brief    This function will set some extra attributions of a semaphore object.
+ *
+ * @note     Currently this function only supports the RT_IPC_CMD_RESET command to reset the semaphore.
+ *
+ * @param    sem is a pointer to a semaphore object.
+ *
+ * @param    cmd is a command word used to configure some attributions of the semaphore.
+ *
+ * @param    arg is the argument of the function to execute the command.
+ *
+ * @return   Return the operation status. When the return value is RT_EOK, the operation is successful.
+ * If the return value is any other values, it means that this function failed to execute.
+ */
+rt_err_t rt_sem_control(rt_sem_t sem, int cmd, void *arg)
+{
+    rt_base_t level;
+
+    /* parameter check */
+    // [架构师注释 1：健壮性校验]
+    // 确保传入的指针不是野指针，并且它确确实实是一个“信号量”类型的对象。
+    RT_ASSERT(sem != RT_NULL);
+    RT_ASSERT(rt_object_get_type(&sem->parent.parent) == RT_Object_Class_Semaphore);
+
+    // =========================================================================
+    // 分支一：强制重置信号量 (RT_IPC_CMD_RESET)
+    // 场景：常用于系统状态机崩溃后的软件复位，无需销毁重建即可恢复初始状态。
+    // =========================================================================
+    if (cmd == RT_IPC_CMD_RESET)
+    {
+        rt_ubase_t value;
+
+        /* get value */
+        // [架构师注释 2：多态传参的艺术]
+        // 这里把 void * 强转为 rt_uintptr_t，直接把指针里的“地址值”当成普通的“整数值”来用。
+        // 这是 C 语言底层极具性能的传参方式，省去了 malloc/free 和内存拷贝的开销。
+        value = (rt_uintptr_t)arg;
+        
+        // [架构师注释 3：关中断，进入临界区]
+        level = rt_spin_lock_irqsave(&(sem->spinlock));
+
+        /* resume all waiting thread */
+        // [架构师注释 4：责任与清场]
+        // 既然管理员要强行重置状态，就必须负责处理掉之前因为等不到资源而挂起的线程。
+        // 调用 resume_all 把候车室清空，并给每个线程下发 RT_ERROR。
+        // 这样那些线程醒来后就不会误以为自己拿到了信号量去执行后续操作，而是进入异常处理分支。
+        rt_susp_list_resume_all(&sem->parent.suspend_thread, RT_ERROR);
+
+        /* set new value */
+        // [架构师注释 5：赋入新值]
+        sem->value = (rt_uint16_t)value;
+        
+        // [架构师注释 6：退出临界区]
+        rt_spin_unlock_irqrestore(&(sem->spinlock), level);
+        
+        // [架构师注释 7：重新洗牌]
+        // 因为刚才强行叫醒了一批线程（它们现在处于就绪态 Ready），其中可能有比当前正在执行的线程
+        // 优先级更高的人物，所以必须手动调用一次调度器，看看要不要让出 CPU。
+        rt_schedule();
+
+        return RT_EOK;
+    }
+    
+    // =========================================================================
+    // 分支二：动态修改容量上限 (RT_IPC_CMD_SET_VLIMIT)
+    // 场景：系统在运行中发现原本分配的缓冲池不够用了（或分配多了），需要动态调整限额。
+    // =========================================================================
+    else if (cmd == RT_IPC_CMD_SET_VLIMIT)
+    {
+        rt_ubase_t max_value;
+        rt_bool_t need_schedule = RT_FALSE; // [架构师注释 8：延迟调度标志位，避免在临界区内调度死锁]
+
+        // 获取并校验传入的新上限值
+        max_value = (rt_uint16_t)((rt_uintptr_t)arg);
+        if (max_value > RT_SEM_VALUE_MAX || max_value < 1)
+        {
+            return -RT_EINVAL; // Invalid argument 错误
+        }
+
+        // [架构师注释 9：关中断，进入临界区]
+        level = rt_spin_lock_irqsave(&(sem->spinlock));
+        
+        // [架构师注释 10：核心防御逻辑 - 缩容导致的冲突解决]
+        if (max_value < sem->value)
+        {
+            // 如果新规定的上限比现在票箱里现有的票数还要少，这就产生逻辑冲突了。
+            // 在这种极端情况下，为了系统的绝对确定性，内核选择：查房！
+            if (!rt_list_isempty(&sem->parent.suspend_thread))
+            {
+                /* resume all waiting thread */
+                // 如果发现外面居然还有人在排队（理论上此时 value 应该为 0，走到这个分支说明系统状态非常畸形），
+                // 彻底强行遣散他们，防止死锁。
+                rt_susp_list_resume_all(&sem->parent.suspend_thread, RT_ERROR);
+                need_schedule = RT_TRUE; // 标记稍后需要调度
+            }
+        }
+        
+        /* set new value */
+        // [架构师注释 11：更新最大值]
+        sem->max_value = max_value;
+        
+        // [架构师注释 12：退出临界区]
+        rt_spin_unlock_irqrestore(&(sem->spinlock), level);
+
+        // [架构师注释 13：安全调度]
+        // 只有在这个大括号里（已经开锁开中断的情况下），才能安全地执行调度。
+        if (need_schedule)
+        {
+            rt_schedule();
+        }
+
+        return RT_EOK;
+    }
+
+    // [架构师注释 14：兜底返回]
+    // 传了不支持的命令（cmd），返回错误。
+    return -RT_ERROR;
+}
+RTM_EXPORT(rt_sem_control);
+```
+
+
+- 这种 `control(obj, cmd, arg)` 的接口设计，完美继承了 UNIX 系统中著名的 `ioctl()` (Input/Output Control) 函数哲学。由于 C 语言没有 C++ 的函数重载（Overloading），如果未来你想增加 10 种对信号量的控制功能，你不需要写 10 个新函数，只需要增加新的 `cmd`，并利用万能的 `void *arg` 传递各种数据结构即可。极大保持了底层 API 的稳定性和扩展性。
+
+
+- 在这个函数中，所有导致状态突变的命令，都会伴随着 `RT_ERROR` 的广播（清场）。这也再次印证了我们在之前 `take` 源码中看到的那个伟大的约定：**任何让线程挂起的对象，在发生结构性改变时，都必须负责任地唤醒线程并告知错误码。**
+
+#### Example
+
+
+```c
+#include <rtthread.h>
+
+#define THREAD_PRIORITY         25
+#define THREAD_TIMESLICE        5
+
+/* pointer to semaphore */
+static rt_sem_t dynamic_sem = RT_NULL;
+
+ALIGN(RT_ALIGN_SIZE)
+static char thread1_stack[1024];
+static struct rt_thread thread1;
+static void rt_thread1_entry(void *parameter)
+{
+    static rt_uint8_t count = 0;
+
+    while(1)
+    {
+        if(count <= 100)
+        {
+            count++;
+        }
+        else
+            return;
+
+        /* count release semaphore every 10 counts */
+         if(0 == (count % 10))
+        {
+            rt_kprintf("t1 release a dynamic semaphore.\n");
+            rt_sem_release(dynamic_sem);
+        }
+    }
+}
+
+ALIGN(RT_ALIGN_SIZE)
+static char thread2_stack[1024];
+static struct rt_thread thread2;
+static void rt_thread2_entry(void *parameter)
+{
+    static rt_err_t result;
+    static rt_uint8_t number = 0;
+    while(1)
+    {
+        /* permanently wait for the semaphore; once obtain the semaphore, perform the number self-add operation */
+        result = rt_sem_take(dynamic_sem, RT_WAITING_FOREVER);
+        if (result != RT_EOK)
+        {
+            rt_kprintf("t2 take a dynamic semaphore, failed.\n");
+            rt_sem_delete(dynamic_sem);
+            return;
+        }
+        else
+        {
+            number++;
+            rt_kprintf("t2 take a dynamic semaphore. number = %d\n" ,number);
+        }
+    }
+}
+
+/* initialization of the semaphore sample */
+int semaphore_sample(void)
+{
+    /* create a dynamic semaphore with an initial value of 0 */
+    dynamic_sem = rt_sem_create("dsem", 0, RT_IPC_FLAG_FIFO);
+    if (dynamic_sem == RT_NULL)
+    {
+        rt_kprintf("create dynamic semaphore failed.\n");
+        return -1;
+    }
+    else
+    {
+        rt_kprintf("create done. dynamic semaphore value = 0.\n");
+    }
+
+    rt_thread_init(&thread1,
+                   "thread1",
+                   rt_thread1_entry,
+                   RT_NULL,
+                   &thread1_stack[0],
+                   sizeof(thread1_stack),
+                   THREAD_PRIORITY, THREAD_TIMESLICE);
+    rt_thread_startup(&thread1);
+
+    rt_thread_init(&thread2,
+                   "thread2",
+                   rt_thread2_entry,
+                   RT_NULL,
+                   &thread2_stack[0],
+                   sizeof(thread2_stack),
+                   THREAD_PRIORITY-1, THREAD_TIMESLICE);
+    rt_thread_startup(&thread2);
+
+    return 0;
+}
+/* export to msh command list */
+MSH_CMD_EXPORT(semaphore_sample, semaphore sample);
+```
+初学者看这段代码，往往只会看到“发信号-收信号”。但作为底层架构师，我们必须看到代码背后那**惊心动魄的 CPU 抢占过程（Preemptive Scheduling）**：
+
+1. **开局：** 两个线程都 `startup` 后，系统调度器开始工作。因为 Thread 2 优先级高（24），CPU 先给 Thread 2。
+    
+2. **挂起：** Thread 2 一头撞上 `rt_sem_take`，发现票箱为 0，只能乖乖去“候车室”睡觉。此时 CPU 闲下来了，交给了优先级较低的 Thread 1（25）。
+    
+3. **爆发与夺权（灵魂所在！）：** Thread 1 开始愉快地循环 `count++`。当 `count` 变成 10 时，它调用了 `rt_sem_release`。
+    
+    - 回忆一下我们在 `release` 源码里看到的逻辑：`release` 发现候车室里有 Thread 2 在等，于是**直接把票塞给 Thread 2，把 Thread 2 唤醒**。
+        
+    - **关键点来了：** 紧接着 `release` 底层触发了 `rt_schedule()`！调度器一看，哎呀，刚刚醒来的 Thread 2 优先级（24）比当前正在跑的 Thread 1（25）高！
+        
+    - **结果：在 `rt_sem_release` 这个函数还没彻底执行完返回的瞬间，Thread 1 的 CPU 执行权被无情剥夺！CPU 瞬间切到了 Thread 2 的上下文！**
+        
+4. **复位：** Thread 2 醒来，`rt_sem_take` 成功返回 `RT_EOK`，打印出 `number = 1`。然后它继续下一轮 `while(1)` 循环，再次撞上 `rt_sem_take`。此时票又没了，Thread 2 再次挂起睡眠。
+    
+5. **接力：** 此时 CPU 才重新回到刚才被打断的 Thread 1 的 `rt_sem_release` 的下一行代码，继续它的 `count++` 循环……
+    
+
+这个“萍水相逢，夺权即走”的过程会足足上演 10 次！这就是 RTOS 保证实时性（高优先级任务必须第一时间响应）的铁律！
+
+
+#### 运用场景
+
+信号量是一种非常灵活的同步机制，可用于多种场景，比如实现锁机制、进行同步操作、统计资源使用情况等。此外，它还非常适合用于线程之间、中断与线程之间的同步处理。
+
+### 锁定
+
+锁：通常，一个锁会被用于多个试图访问同一共享资源（即临界区）的线程。当使用信号量作为锁时，该信号量资源实例应初始化为 1，表示系统默认情况下只有一种资源可用。由于信号量的值总是在 1 和 0 之间切换，因此这种锁也被称为二进制信号量。如下图所示，当某个线程需要访问共享资源时，必须先获取该资源的锁。一旦该线程成功获取了锁，其他试图访问该共享资源的线程就会被阻塞，因为它们无法获取到锁。这是因为当其他线程尝试获取锁时，该锁已被占用（信号量值为 0）。当持有锁的线程完成操作并离开临界区后，它会释放锁，此时第一个处于等待状态的线程就能进入临界区了。
+
+### 线程间的中断同步
+
+信号量也可以被轻松地用于中断线程间的同步操作，比如作为中断触发机制。当中断服务例程被触发时，需要通知相关线程来进行相应的数据处理。此时，可以将信号量的初始值设置为 0。当线程试图获取该信号量时，由于初始值为 0，线程将会被挂起，直到信号量被释放。当中断被触发后，系统会首先执行与硬件相关的操作，例如从硬件 I/O 端口读取相关数据、确认中断来源并清除中断信号，之后再释放信号量，从而唤醒相应的线程以继续进行数据处理。例如，FinSH 线程的处理过程如下图所示。
+
+
+### 资源数量
+
+信号量也可以被视作一种用于计数递增或递减的计数器。需要注意的是，信号量的值始终是非负的。例如，如果信号量的初始值为 5，那么该信号量最多可以被连续减少 5 次，直到其值变为 0。当线程之间的处理速度不匹配时，使用信号量非常合适。此时，信号量可以表示前一个线程已完成的任务数量；当任务被分配给下一个线程时，信号量又可以用来连续处理多个事件。例如，在生产者-消费者问题中，生产者可以多次释放信号量，而消费者在每次接收任务时，都可以处理多个由信号量所代表的资源
+
+## Mutex
+
+
+互斥量只有两种状态：未锁定和已锁定。当某个线程持有互斥量时，该互斥量即处于已锁定状态，该线程便拥有其对所有权。相反，当该线程释放互斥量时，互斥量即变为未锁定状态，该线程也失去对其的所有权。只要某个线程持有互斥量，其他线程就无法解锁或持有该互斥量。持有互斥量的线程还可以在不被挂起的情况下再次获取该互斥量的锁，如下图所示。这一特性与普通的二进制信号量截然不同：在信号量中，由于不存在“实例”这一概念，如果某个线程递归地持有信号量，该线程将会被挂起（最终可能导致死锁）。
+
+互斥锁和信号量的区别在于：拥有互斥锁的线程对该互斥锁具有控制权。互斥锁支持递归使用，同时能防止线程优先级的反转。此外，只有持有互斥锁的线程才能释放它，而信号量则可以被任何线程释放。
+
+**关于优先级反转的逻辑没怎么看懂，有点过于复杂了，以后再说吧**
+
+
+`rt_mutex` 结构体中的优先级模块（`original_priority` 等字段），是专门用来实现“优先级继承协议（Priority Inheritance Protocol, PIP）”的，其唯一目的就是为了解决实时操作系统中臭名昭著、足以导致系统崩溃的致命缺陷——**优先级反转（Priority Inversion）**。
+
+
+```c
+struct rt_mutex
+    {
+        struct rt_ipc_object parent;                /* inherited from the ipc_object class */
+
+        rt_uint16_t          value;                   /* mutex value */
+        rt_uint8_t           original_priority;     /* hold the original priority of the thread */
+        rt_uint8_t           hold;                     /* number of times holding the threads */
+        struct rt_thread    *owner;                 /* thread that currently owns the mutex */
+    };
+    /* rt_mutext_t pointer type of the one poniter pointing to the mutex structure */
+    typedef struct rt_mutex* rt_mutex_t;
+```
+
+
+
+让我们把这段结构体拆开，看看这些特殊字段各自的使命：
+
+- `struct rt_ipc_object parent;`
+    
+    - 继承自 IPC 父类。这里面藏着那个我们之前学过的“挂起等待链表（候车室）”。
+        
+- `rt_uint16_t value;`
+    
+    - 互斥量的值（通常 1 代表锁空闲，0 代表锁被占用）。
+        
+- `rt_uint8_t original_priority;` **（核心魔法变量）**
+    
+    - **含义**：保存线程“原始的/出厂时的”优先级。
+        
+    - **作用**：当一个低优先级线程拿着锁，被系统临时强行“提拔”为高优先级后，系统必须有一个地方记住它原本的真实身份。等它把锁还回去时，系统要依靠这个字段把它“打回原形”。
+        
+- `rt_uint8_t hold;`
+    
+    - **含义**：持有计数器（解决嵌套死锁）。
+        
+    - **作用**：如果当前线程已经拿到了这把锁，它在后续的函数调用中如果**再次**去拿这把锁，系统不会让它挂起睡觉（否则就自己把自己死锁了），而是直接让 `hold++`。释放时 `hold--`，直到 `hold == 0` 时，锁才真正被交出。这叫递归锁（Recursive Lock）机制。
+        
+- `struct rt_thread *owner;` **（所有权登记本）**
+    
+    - **含义**：记录当前到底是**哪一个具体的线程**拿着这把锁。
+        
+    - **作用**：信号量是没有 Owner 的（谁都可以释放），但互斥锁**必须**实名制！只有系统知道谁拿着锁，系统才能去提拔那个人的优先级。
+
+#### 解决优先级反转的内联函数
+
+
+这三个内联函数是 RT-Thread 互斥量模块的核心引擎，它们完美协同，实现了“优先级继承协议（Priority Inheritance Protocol, PIP）”**，其唯一目的就是动态地调整线程的优先级，从而解决 RTOS 领域臭名昭著的**“优先级反转（Priority Inversion）”灾难。
+
+```c
+#ifdef RT_USING_MUTEX
+
+/* * 核心函数一：更新【互斥量】的优先级记录
+ * 作用：看看当前有谁在门外排队，把排在最前面那个人的“高优先级”记录到互斥量身上。
+ */
+rt_inline rt_uint8_t _mutex_update_priority(struct rt_mutex *mutex)
+{
+    struct rt_thread *thread;
+
+    // [架构师注释 1：检查候车室] 如果门外有人排队（挂起链表不为空）
+    if (!rt_list_isempty(&mutex->parent.suspend_thread))
+    {
+        // 因为我们在 enqueue 的时候用的是 RT_IPC_FLAG_PRIO（按优先级排队），
+        // 所以链表的第一个节点（next）必定是所有等待者中优先级最高的那个人！
+        thread = RT_THREAD_LIST_NODE_ENTRY(mutex->parent.suspend_thread.next);
+        // 把这个最高优先级，赋值给互斥量自身的 priority 变量。
+        mutex->priority = rt_sched_thread_get_curr_prio(thread);
+    }
+    else
+    {
+        // 门外没人排队，互斥量恢复成最低优先级 0xff（255）
+        mutex->priority = 0xff;
+    }
+
+    return mutex->priority;
+}
+
+/* * 核心函数二：计算【当前线程】到底应该被“拔高”到什么优先级
+ * 作用：一个线程可能同时拿着好几把锁。这个函数遍历该线程拿着的所有锁，
+ * 找出所有门外排队的人里面，级别最高的那个人，作为该线程的新优先级。
+ */
+rt_inline rt_uint8_t _thread_get_mutex_priority(struct rt_thread* thread)
+{
+    rt_list_t *node = RT_NULL;
+    struct rt_mutex *mutex = RT_NULL;
+    
+    // [架构师注释 2：不忘初心] 先获取线程出厂时的“初始优先级”打底。
+    rt_uint8_t priority = rt_sched_thread_get_init_prio(thread);
+
+    // [架构师注释 3：遍历持有的资产] 遍历当前线程拿到的所有互斥量
+    rt_list_for_each(node, &(thread->taken_object_list))
+    {
+        mutex = rt_list_entry(node, struct rt_mutex, taken_list);
+        rt_uint8_t mutex_prio = mutex->priority;
+        
+        /* prio at least be priority ceiling */
+        // [架构师注释 4：优先级天花板协议] 如果启用了优先级天花板（另一种防反转协议），
+        // 则取互斥量的天花板优先级和等待者优先级中更高的那一个（数字更小的）。
+        mutex_prio = mutex_prio < mutex->ceiling_priority ? mutex_prio : mutex->ceiling_priority;
+
+        // [架构师注释 5：择优录取] 谁的优先级更高（数字更小），我就继承谁的优先级！
+        if (priority > mutex_prio)
+        {
+            priority = mutex_prio;
+        }
+    }
+
+    return priority;
+}
+
+/* * 核心函数三：真正去修改线程的优先级，并处理【连环优先级反转】！
+ * 作用：不仅修改目标线程的优先级，如果目标线程自己也被别的锁卡住了，还要向上追溯，
+ * 把卡住它的那个线程的优先级也一并提高！（这就是所谓的传递性优先级继承）
+ */
+rt_inline void _thread_update_priority(struct rt_thread *thread, rt_uint8_t priority, int suspend_flag)
+{
+    rt_err_t ret = -RT_ERROR;
+    struct rt_object* pending_obj = RT_NULL;
+
+    LOG_D("thread:%s priority -> %d", thread->parent.name, priority);
+
+    /* change priority of the thread */
+    // [架构师注释 6：直接提拔] 调用调度器底层函数，直接修改当前线程的当前优先级
+    ret = rt_sched_thread_change_priority(thread, priority);
+
+    // ================== 【高能预警：连环继承逻辑】 ==================
+    // 如果修改成功，并且！当前这个被提拔的线程，它自己竟然是在睡觉（挂起态）！
+    // 为什么它在睡觉？因为它在等另一把锁！
+    while ((ret == RT_EOK) && rt_sched_thread_is_suspended(thread))
+    {
+        /* whether change the priority of taken mutex */
+        pending_obj = thread->pending_object;
+
+        if (pending_obj && rt_object_get_type(pending_obj) == RT_Object_Class_Mutex)
+        {
+            rt_uint8_t mutex_priority = 0xff;
+            struct rt_mutex* pending_mutex = (struct rt_mutex *)pending_obj;
+
+            /* re-insert thread to suspended thread list to resort priority list */
+            // [架构师注释 7：重新排队] 因为当前线程的优先级被拔高了，它在另一把锁的门外排队时，
+            // 显然有资格“插队”到更前面了。所以先拔出来，再按照新优先级重新插回去。
+            rt_list_remove(&RT_THREAD_LIST_NODE(thread));
+            ret = rt_susp_list_enqueue(&(pending_mutex->parent.suspend_thread), thread,
+                                       pending_mutex->parent.parent.flag);
+            
+            if (ret == RT_EOK)
+            {
+                /* update priority */
+                // [架构师注释 8：更新那把新锁的记录]
+                _mutex_update_priority(pending_mutex);
+
+                /* change the priority of mutex owner thread */
+                // [架构师注释 9：递归溯源（神来之笔！）]
+                // 既然那把锁的记录更新了，那拿着那把锁的人（owner），它的优先级是不是也该被提拔？
+                mutex_priority = _thread_get_mutex_priority(pending_mutex->owner);
+                
+                // 如果拿着那把锁的人，现在的优先级还没达到最新要求，那就进入下一次 while 循环，
+                // 把那个 owner 线程的优先级也提拔上来！
+                if (mutex_priority != rt_sched_thread_get_curr_prio(pending_mutex->owner))
+                {
+                    thread = pending_mutex->owner;
+                    ret = rt_sched_thread_change_priority(thread, mutex_priority);
+                }
+                else
+                {
+                    ret = -RT_ERROR; // 打断循环
+                }
+            }
+        }
+        else
+        {
+            ret = -RT_ERROR; // 它等的不是互斥锁，打断循环
+        }
+    }
+}
+#endif
+```
+
+**互斥量是如何破局的？（优先级继承）** 当 **High** 去拿被 **Low** 霸占的锁时：
+
+- `_mutex_update_priority` 会把互斥量的优先级更新为 **High** 的优先级。
+    
+- 然后触发 `_thread_update_priority`，系统会说：“**Low**，你既然拿着 **High** 想要的资源，那我就破例把你的优先级临时提升到和 **High** 一样高！”
+    
+- 结果：**Low** 变成了假装的高优先级。此时 **Med** 醒来，发现 **Low** 的当前优先级比自己高，**Med** 就无法抢占 CPU 了。**Low** 得以迅速执行完临界区代码，释放互斥量。
+    
+- 释放时，**Low** 会调用 `_thread_get_mutex_priority` 重新评估自己，瞬间被打回原形（恢复初始低优先级）。**High** 顺利拿到锁继续飞奔。
+
+
+#### 解决优先级的高层调用
+
+
+`_check_and_update_prio` 和 `_mutex_before_delete_detach`
+
+
+- **优先级恢复（Priority Reversion / Demotion）的必要性：** 优先级继承不能是“一锤子买卖”。如果一个低优先级线程（Low）因为拿了互斥量，被高优先级线程（High）硬生生提拔到了 VIP 级别。当这个互斥量被强行 Delete 掉时，Low 线程就**失去了继续享受 VIP 待遇的合法性**。如果不把它“打回原形（降级）”，它就会一直霸占 CPU，导致真正的中等优先级任务饿死。`_check_and_update_prio` 就是在做这个“验明正身，打回原形”的工作。
+    
+- **资源所有权（Ownership）的双向解绑：** 你注意到 `rt_list_remove(&mutex->taken_list);` 这行代码了吗？ 在信号量（Semaphore）被删除时，系统只需要唤醒排队的人把对象删了就行。但是互斥量（Mutex）有 Owner！互斥量挂在 Owner 的链表里。如果互斥量的内存被释放（free）了，却不从 Owner 的链表里把它摘下来，Owner 下次遍历自己手里的锁时，就会踩到野指针（Dangling Pointer）导致系统 HardFault 崩溃！ 这就是为什么 Mutex 的 Delete 过程比 Semaphore 复杂得多。
+
+```c
+/**
+ * @brief 内部辅助函数：检查并更新线程的优先级（打回原形）
+ */
+static rt_bool_t _check_and_update_prio(rt_thread_t thread, rt_mutex_t mutex)
+{
+    // [架构师注释 1：安全断言] 此时调度器必须是锁住的
+    RT_SCHED_DEBUG_IS_LOCKED;
+    rt_bool_t do_sched = RT_FALSE;
+
+    // [架构师注释 2：判断是否需要降级]
+    // 什么时候需要重新计算线程优先级？
+    // 条件1：这个互斥锁开启了优先级天花板协议 (ceiling_priority != 0xFF)
+    // 条件2：线程当前的优先级，刚好等于这个互斥量身上记录的优先级！
+    // (这说明线程现在的“高优先级”，极有可能就是靠这把被砸碎的锁给撑起来的！)
+    if ((mutex->ceiling_priority != 0xFF) || (rt_sched_thread_get_curr_prio(thread) == mutex->priority))
+    {
+        rt_uint8_t priority = 0xff;
+
+        /* get the highest priority in the taken list of thread */
+        // [架构师注释 3：调用内联引擎！]
+        // 这就是我们上一课学的神仙函数！
+        // 既然这把锁要没了，那就让线程翻翻自己口袋里【剩下】的锁，看看剩下的锁里，
+        // 能给它提供的最高优先级是多少？（如果没别的锁了，就会返回它的出厂初始优先级）。
+        priority = _thread_get_mutex_priority(thread);
+
+        // [架构师注释 4：实施降级] 把计算出来的新（更低的）优先级，重新拍到线程身上。
+        rt_sched_thread_change_priority(thread, priority);
+
+        /**
+         * notify a pending reschedule. Since scheduler is locked, we will not
+         * really do a re-schedule at this point
+         */
+        // 既然有人优先级降了，那就标记一下：一会儿解开调度器锁的时候，记得触发一次调度！
+        do_sched = RT_TRUE;
+    }
+    return do_sched;
+}
+
+/**
+ * @brief 互斥量销毁前的核心清理动作
+ */
+static void _mutex_before_delete_detach(rt_mutex_t mutex)
+{
+    rt_sched_lock_level_t slvl;
+    rt_bool_t need_schedule = RT_FALSE;
+
+    rt_spin_lock(&(mutex->spinlock));
+    
+    /* wakeup all suspended threads */
+    // [架构师注释 5：暴力清场] 
+    // 门都要被拆了，排队的人全赶走！塞给他们一个 RT_ERROR。
+    rt_susp_list_resume_all(&(mutex->parent.suspend_thread), RT_ERROR);
+
+    // [架构师注释 6：锁调度器] 准备修改线程的核心链表，严禁发生上下文切换！
+    rt_sched_lock(&slvl);
+
+    /* remove mutex from thread's taken list */
+    // [架构师注释 7：没收资产] 把这把锁，从那个霸占它的 Owner 线程的“已获取资产链表”里强行拔出来！
+    rt_list_remove(&mutex->taken_list);
+
+    /* whether change the thread priority */
+    // [架构师注释 8：清算 Owner] 
+    if (mutex->owner)
+    {
+        // 调用上面那个辅助函数，剥夺 Owner 虚高的优先级。
+        need_schedule = _check_and_update_prio(mutex->owner, mutex);
+    }
+
+    // [架构师注释 9：开锁并按需调度]
+    if (need_schedule)
+    {
+        // 这是一个融合 API：解锁调度器的同时，立刻触发一次抢占调度。
+        rt_sched_unlock_n_resched(slvl);
+    }
+    else
+    {
+        rt_sched_unlock(slvl);
+    }
+
+    /* unlock and do necessary reschedule if required */
+    rt_spin_unlock(&(mutex->spinlock));
+}
+```
+
+
+#### 创建和删除
+
+
+```c
+/**
+ * @brief    Initialize a static mutex object.
+ */
+rt_err_t rt_mutex_init(rt_mutex_t mutex, const char *name, rt_uint8_t flag)
+{
+    /* flag parameter has been obsoleted */
+    // [架构师注释 1：废弃参数的向下兼容]
+    // 早期版本的 RT-Thread 允许用户选择互斥量的排队方式（FIFO 或 PRIO）。
+    // 但后来架构师们发现，互斥量如果不用 PRIO，根本无法解决优先级反转！
+    // 为了不让老用户的代码编译报错，保留了这个参数，但用 RT_UNUSED 宏避免编译器报“参数未使用”的警告。
+    RT_UNUSED(flag);
+
+    /* parameter check */
+    RT_ASSERT(mutex != RT_NULL);
+
+    /* initialize object */
+    // [架构师注释 2：基础类与 IPC 父类初始化]
+    // 挂载到系统对象管理器，并初始化候车室（挂起链表）。和信号量一模一样。
+    rt_object_init(&(mutex->parent.parent), RT_Object_Class_Mutex, name);
+    _ipc_object_init(&(mutex->parent));
+
+    // ================== 【互斥量的四大专属灵魂变量】 ==================
+    
+    // 1. 实名登记本：当前谁拿着这把锁？刚初始化时没人拿，设为空。
+    mutex->owner    = RT_NULL;
+    
+    // 2. 优先级记录：当前排队的人里面，最高优先级是多少？
+    // 0xFF（255）代表最低优先级（即门外没人排队）。
+    mutex->priority = 0xFF;
+    
+    // 3. 递归嵌套深度：这个变量允许同一个线程连续多次 take 这把锁而不死锁！刚开始为 0。
+    mutex->hold     = 0;
+    
+    // 4. 天花板协议：用于另一种防反转协议（Priority Ceiling），0xFF 代表默认不启用。
+    mutex->ceiling_priority = 0xFF;
+    
+    // 5. 资产挂载点：当一个线程拿到这把锁时，锁就会通过这个链表节点，挂到那个线程的口袋里。
+    rt_list_init(&(mutex->taken_list));
+
+    /* flag can only be RT_IPC_FLAG_PRIO. RT_IPC_FLAG_FIFO cannot solve the unbounded priority inversion problem */
+    // [架构师注释 3：强制优先级排队]
+    // 不管用户传进来的 flag 是什么，内核在这里“霸道”地将其强制覆写为 RT_IPC_FLAG_PRIO。
+    // 这行注释更是直接道出了原因：FIFO 解决不了无界优先级反转问题！
+    mutex->parent.parent.flag = RT_IPC_FLAG_PRIO;
+    
+    rt_spin_lock_init(&(mutex->spinlock));
+
+    return RT_EOK;
+}
+RTM_EXPORT(rt_mutex_init);
+
+
+/**
+ * @brief    This function will detach a static mutex object.
+ */
+rt_err_t rt_mutex_detach(rt_mutex_t mutex)
+{
+    /* parameter check */
+    RT_ASSERT(mutex != RT_NULL);
+    RT_ASSERT(rt_object_get_type(&mutex->parent.parent) == RT_Object_Class_Mutex);
+    RT_ASSERT(rt_object_is_systemobject(&mutex->parent.parent));
+
+    // [架构师注释 4：融合调用！]
+    // 看到这个函数了吗？这正是我们上一轮刚刚深度剖析过的强拆善后小组！
+    // 它负责：赶走排队线程 -> 把锁从 owner 口袋里没收 -> 剥夺 owner 虚高的优先级。
+    _mutex_before_delete_detach(mutex);
+
+    /* detach mutex object */
+    // [架构师注释 5：注销户口] 从系统的静态对象容器大链表中将其摘除。
+    rt_object_detach(&(mutex->parent.parent));
+
+    return RT_EOK;
+}
+RTM_EXPORT(rt_mutex_detach);
+```
+
+
+
+#### 锁的调用
+`_rt_mutex_take` 及其包装函数是互斥量的**“通行检票口”**：它完美处理了**“自己重复拿锁（递归锁）”**、**“空闲直接拿”**、**“被人霸占时挂起并触发优先级继承”**，以及最复杂的**“等待超时后醒来，动态剥夺/撤销借出的优先级”**四大核心场景。
+
+
+`rt_mutex_take`
+
+```c
+/**
+ * @brief 内部核心函数：获取互斥锁
+ */
+static rt_err_t _rt_mutex_take(rt_mutex_t mutex, rt_int32_t timeout, int suspend_flag)
+{
+    struct rt_thread *thread;
+    rt_err_t ret;
+
+    // [架构师注释 1：上下文生死红线！]
+    // 互斥量由于涉及所有权和优先级继承，绝对、绝对、绝对不能在中断(ISR)里调用！
+    // 即使 timeout 传 0 也不行！这里的 RT_TRUE 标志会让系统在中断里调用时直接抛出断言死机。
+    RT_DEBUG_SCHEDULER_AVAILABLE(RT_TRUE);
+
+    /* parameter check */
+    RT_ASSERT(mutex != RT_NULL);
+    RT_ASSERT(rt_object_get_type(&mutex->parent.parent) == RT_Object_Class_Mutex);
+
+    /* get current thread */
+    thread = rt_thread_self(); // 获取正在申请锁的当前线程
+
+    // [架构师注释 2：关中断上自旋锁] 保护这把锁的内部状态
+    rt_spin_lock(&(mutex->spinlock));
+
+    RT_OBJECT_HOOK_CALL(rt_object_trytake_hook, (&(mutex->parent.parent)));
+
+    LOG_D("mutex_take: current thread %s, hold: %d",
+          thread->parent.name, mutex->hold);
+
+    /* reset thread error */
+    thread->error = RT_EOK;
+
+    // ====================================================================
+    // 场景一：【递归锁机制】锁已经在老子手里了！
+    // ====================================================================
+    if (mutex->owner == thread)
+    {
+        if (mutex->hold < RT_MUTEX_HOLD_MAX)
+        {
+            /* it's the same thread */
+            // [架构师注释 3：Hold计数] 
+            // 同一个线程再次拿同一把锁，不会死锁！只会把持有计数器 +1。
+            // 以后释放的时候，也要对应 release 这么多次才能真正解开。
+            mutex->hold ++;
+        }
+        else
+        {
+            rt_spin_unlock(&(mutex->spinlock));
+            return -RT_EFULL; /* value overflowed */
+        }
+    }
+    else
+    {
+        // ====================================================================
+        // 场景二：【空闲直接拿】太棒了，这把锁没人用！
+        // ====================================================================
+        if (mutex->owner == RT_NULL)
+        {
+            /* set mutex owner and original priority */
+            // [架构师注释 4：实名登记]
+            mutex->owner    = thread;  // 登记所有权
+            mutex->priority = 0xff;    // 门外没人排队，记录为最低优先级
+            mutex->hold     = 1;       // 持有次数为 1
+
+            // 如果这把锁配置了天花板优先级协议（Priority Ceiling）
+            if (mutex->ceiling_priority != 0xFF)
+            {
+                /* set the priority of thread to the ceiling priority */
+                // 拿到锁的瞬间，当前线程就被强制提拔到天花板优先级！
+                if (mutex->ceiling_priority < rt_sched_thread_get_curr_prio(mutex->owner))
+                    _thread_update_priority(mutex->owner, mutex->ceiling_priority, suspend_flag);
+            }
+
+            /* insert mutex to thread's taken object list */
+            // [架构师注释 5：装进口袋] 把这把锁挂入当前线程的“已持有资产链表”中。
+            rt_list_insert_after(&thread->taken_object_list, &mutex->taken_list);
+        }
+        // ====================================================================
+        // 场景三：【锁被别人霸占了】准备排队睡觉，并触发优先级继承！
+        // ====================================================================
+        else
+        {
+            /* no waiting, return with timeout */
+            // [架构师注释 6：非阻塞尝试 TryTake]
+            if (timeout == 0)
+            {
+                thread->error = RT_ETIMEOUT;
+                rt_spin_unlock(&(mutex->spinlock));
+                return -RT_ETIMEOUT; // 不愿意等，直接滚蛋
+            }
+            else
+            {
+                rt_sched_lock_level_t slvl;
+                rt_uint8_t priority;
+
+                /* suspend current thread */
+                // [架构师注释 7：去候车室排队睡觉]
+                ret = rt_thread_suspend_to_list(thread, &(mutex->parent.suspend_thread),
+                                                mutex->parent.parent.flag, suspend_flag);
+                if (ret != RT_EOK)
+                {
+                    rt_spin_unlock(&(mutex->spinlock));
+                    return ret;
+                }
+
+                /* set pending object in thread to this mutex */
+                // 记录自己是因为谁睡着的
+                thread->pending_object = &(mutex->parent.parent);
+
+                // [架构师注释 8：核心防线 - 优先级继承引擎启动！]
+                rt_sched_lock(&slvl); // 锁调度器，准备动刀子改优先级
+
+                priority = rt_sched_thread_get_curr_prio(thread);
+
+                /* update the priority level of mutex */
+                // 如果当前正在排队的我（比如 High），比这把锁身上记录的排队者优先级还要高
+                if (priority < mutex->priority)
+                {
+                    mutex->priority = priority; // 刷新锁的最高排队者记录
+                    
+                    // 如果我的优先级，比那个正在屋里拿着锁的人（owner）还要高！
+                    if (mutex->priority < rt_sched_thread_get_curr_prio(mutex->owner))
+                    {
+                        // 把屋里那个人（owner）强行提拔到跟我一样的优先级！
+                        _thread_update_priority(mutex->owner, priority, RT_UNINTERRUPTIBLE); 
+                    }
+                }
+                rt_sched_unlock(slvl);
+
+                /* has waiting time, start thread timer */
+                // [架构师注释 9：上个闹钟]
+                if (timeout > 0)
+                {
+                    rt_tick_t timeout_tick = timeout;
+                    rt_timer_control(&(thread->thread_timer),
+                                     RT_TIMER_CTRL_SET_TIME,
+                                     &timeout_tick);
+                    rt_timer_start(&(thread->thread_timer));
+                }
+
+                rt_spin_unlock(&(mutex->spinlock));
+
+                // [架构师注释 10：灵魂断层！上下文切换！]
+                rt_schedule(); // 线程在这里彻底休眠！交出 CPU！
+
+                // ====================================================================
+                // 【时空折叠】：不知过了多久，线程醒了！往下执行！
+                // ====================================================================
+                rt_spin_lock(&(mutex->spinlock));
+
+                if (mutex->owner == thread)
+                {
+                    /**
+                     * get mutex successfully
+                     */
+                    // [场景 A：正常苏醒] 如果 owner 变成我了，说明是别人释放锁把我叫醒的。大吉大利！
+                    RT_ASSERT(thread->error == RT_EOK);
+                }
+                else
+                {
+                    /* the mutex has not been taken and thread has detach from the pending list. */
+                    // [场景 B：异常苏醒 / 超时跑路] 
+                    // [架构师注释 11：极其严谨的撤销机制！]
+                    // 醒来发现锁还是别人的！说明我是被定时器闹钟（超时）叫醒的，或者被强杀信号惊醒的。
+                    rt_bool_t need_update = RT_FALSE;
+                    RT_ASSERT(mutex->owner != thread);
+
+                    ret = thread->error;
+                    if (ret == RT_EOK) { ret = -RT_EINTR; }
+
+                    rt_sched_lock(&slvl);
+
+                    // 既然我（比如是 High）不等了，我要走了，
+                    // 那么刚才我借给那个 owner 的“VIP 优先级光环”，我得收回来！
+                    if (mutex->owner && rt_sched_thread_get_curr_prio(mutex->owner) == rt_sched_thread_get_curr_prio(thread))
+                        need_update = RT_TRUE;
+
+                    /* update the priority of mutex */
+                    // 看看候车室里剩下的人里面，最高优先级是谁？重新记录在锁身上。
+                    if (!rt_list_isempty(&mutex->parent.suspend_thread))
+                    {
+                        struct rt_thread *th;
+                        th = RT_THREAD_LIST_NODE_ENTRY(mutex->parent.suspend_thread.next);
+                        mutex->priority = rt_sched_thread_get_curr_prio(th);
+                    }
+                    else
+                    {
+                        mutex->priority = 0xff; // 候车室空了
+                    }
+
+                    /* try to change the priority of mutex owner thread */
+                    if (need_update)
+                    {
+                        // [架构师注释 12：动态剥夺！]
+                        // 重新评估那个 owner 的优先级（把它打回原形，或者降到剩下排队的人的最高优先级）
+                        priority = _thread_get_mutex_priority(mutex->owner);
+                        if (priority != rt_sched_thread_get_curr_prio(mutex->owner))
+                        {
+                            _thread_update_priority(mutex->owner, priority, RT_UNINTERRUPTIBLE);
+                        }
+                    }
+
+                    rt_sched_unlock(slvl);
+                    rt_spin_unlock(&(mutex->spinlock));
+
+                    /* clear pending object before exit */
+                    thread->pending_object = RT_NULL; // 拍拍屁股走人
+
+                    return ret > 0 ? -ret : ret; // 返回超时或中断错误码
+                }
+            }
+        }
+    }
+
+    rt_spin_unlock(&(mutex->spinlock));
+    RT_OBJECT_HOOK_CALL(rt_object_take_hook, (&(mutex->parent.parent)));
+
+    return RT_EOK;
+}
+
+// ============== 下面的四个函数，全都是上面这个核心引擎的“换皮马甲” ==============
+// 用法和我们在 Semaphore 里面讲的完全一样，靠传入不同的超时时间和 suspend_flag 来区分。
+
+rt_err_t rt_mutex_take(rt_mutex_t mutex, rt_int32_t time)
+{
+    return _rt_mutex_take(mutex, time, RT_UNINTERRUPTIBLE); // 常规：死等，不接受信号打断
+}
+RTM_EXPORT(rt_mutex_take);
+
+rt_err_t rt_mutex_take_interruptible(rt_mutex_t mutex, rt_int32_t time)
+{
+    return _rt_mutex_take(mutex, time, RT_INTERRUPTIBLE); // POSIX 风格：可被软信号打断
+}
+RTM_EXPORT(rt_mutex_take_interruptible);
+
+rt_err_t rt_mutex_take_killable(rt_mutex_t mutex, rt_int32_t time)
+{
+    return _rt_mutex_take(mutex, time, RT_KILLABLE); // 强杀风格：只能被致死信号打断
+}
+RTM_EXPORT(rt_mutex_take_killable);
+
+rt_err_t rt_mutex_trytake(rt_mutex_t mutex)
+{
+    return rt_mutex_take(mutex, RT_WAITING_NO); // 非阻塞尝试：有就拿，没有拉倒
+}
+RTM_EXPORT(rt_mutex_trytake);
+```
+
+
+
+- **借与还的哲学（Lending and Revoking）：** 在系统底层开发中，任何对全局状态（如优先级、内存分配、锁所有权）的临时修改，都必须有严丝合缝的“回退路线（Fallback）”。当你改变了一个状态，你必须穷尽思考：**“如果中途失败了，如果等待超时了，如果被人强制打断了，我怎么把状态恢复成原样？”** 这段 `else` 里的降级逻辑，就是对这种编程哲学最好的诠释。
+    
+- **门面模式再现：** 底层的 `_rt_mutex_take` 包含了所有可怕的细节（自旋锁、调度锁、时间轮、优先级），而通过简单的包装，应用层程序员只需要调用 `rt_mutex_take(mutex, RT_WAITING_FOREVER)` 就能安全无忧地使用，把系统的复杂性死死封印在内核之中。
+
+1. **递归互斥（Recursive Mutex）的精妙：** 如果不用 `hold` 变量，当 A 线程拿了锁，又调用了一个内部也会去拿这把锁的子函数时，A 线程就会进入排队状态。但这把锁偏偏又是 A 自己拿着的！于是 A 永远无法运行，锁也永远无法释放，系统自我绞杀。 代码中的 `if (mutex->owner == thread) { mutex->hold ++; }` 完美解决了这层问题。它是文件系统（VFS）、复杂的网络协议栈驱动中保证不死锁的基石。
+    
+2. **“超时苏醒”引发的连环车祸与自愈能力（Priority Reversion）：** 整段代码最难懂的地方在 `rt_schedule()` 醒来之后的 `else` 块。 假设 High 线程因为等一把被 Low 拿着的锁，把 Low 提拔成了 High 级别。 但是 100ms 过去了，Low 还没处理完，High 线程的超时闹钟响了。 High 线程醒来后非常生气：“不等了！我要去干别的事了！” **此时，极其严谨的逻辑来了：** 既然 High 已经不在门外排队了，那么 Low 就不配继续享受 High 赋予它的 VIP 优先级。内核必须通过一系列计算，重新找到候车室里剩下的人（比如只剩下一个 Med 线程在排队），然后把 Low 从 High 级别“降级”到 Med 级别。这就是内核架构师必须考虑的**资源状态状态机闭环**。
+
+#### 锁的释放
+
+`rt_mutex_release`
+
+
+这个函数是互斥量的“退房/交钥匙中心”**：它负责处理递归锁的逐层解开；当锁真正空闲时，它会立刻**剥夺**当前线程因为这把锁而获得的“虚高优先级”，并将钥匙**直接手递手交给门外排队的第一位候补者，触发系统重新调度。
+
+```c
+rt_err_t rt_mutex_release(rt_mutex_t mutex)
+{
+    rt_sched_lock_level_t slvl;
+    struct rt_thread *thread;
+    rt_bool_t need_schedule;
+
+    /* parameter check */
+    RT_ASSERT(mutex != RT_NULL);
+    RT_ASSERT(rt_object_get_type(&mutex->parent.parent) == RT_Object_Class_Mutex);
+
+    need_schedule = RT_FALSE;
+
+    /* only thread could release mutex because we need test the ownership */
+    // [架构师注释 1：中断禁区] 
+    // 互斥量必须实名制退房，中断里没有线程上下文，绝对不能调用 release！
+    RT_DEBUG_IN_THREAD_CONTEXT;
+
+    /* get current thread */
+    thread = rt_thread_self();
+
+    rt_spin_lock(&(mutex->spinlock));
+
+    LOG_D("mutex_release:current thread %s, hold: %d",
+          thread->parent.name, mutex->hold);
+
+    RT_OBJECT_HOOK_CALL(rt_object_put_hook, (&(mutex->parent.parent)));
+
+    // ====================================================================
+    // 防线一：【防盗机制】只有这把锁的拥有者，才有资格释放它！
+    // ====================================================================
+    if (thread != mutex->owner)
+    {
+        // 信号量是谁都能 release 的，但互斥锁绝对不行！
+        // 如果 B 线程试图去 release 一把被 A 线程拿着的锁，直接报错打回。
+        thread->error = -RT_ERROR;
+        rt_spin_lock(&(mutex->spinlock));
+        return -RT_ERROR;
+    }
+
+    // ====================================================================
+    // 防线二：【递归解锁】
+    // ====================================================================
+    mutex->hold --;
+    
+    // 如果减完之后还不为 0，说明这个线程之前嵌套 take 了好几次。
+    // 这次 release 只是解开了其中一层，锁还不能给别人。直接结束即可。
+    
+    // 如果等于 0，说明这是最后一次 release，锁真正被释放了！
+    if (mutex->hold == 0)
+    {
+        rt_sched_lock(&slvl); // 锁调度器，准备动刀子改优先级
+
+        /* remove mutex from thread's taken list */
+        // [架构师注释 2：交出资产] 从自己口袋（已获取对象链表）里把这把锁掏出来。
+        rt_list_remove(&mutex->taken_list);
+
+        /* whether change the thread priority */
+        // [架构师注释 3：动态降级 / 归还特权！]
+        // 极其重要！既然我不拿这把锁了，那我之前因为这把锁而借来的 VIP 优先级（优先级继承），
+        // 就必须还给系统！调用这个函数，把我“打回原形”。
+        need_schedule = _check_and_update_prio(thread, mutex);
+
+        /* wakeup suspended thread */
+        // ====================================================================
+        // 防线三：【如果有排队的人，直接手递手交钥匙 (Direct Handoff)】
+        // ====================================================================
+        if (!rt_list_isempty(&mutex->parent.suspend_thread))
+        {
+            struct rt_thread *next_thread;
+            // [架构师注释 4：超强防御 - 应对极限竞态条件]
+            // 为什么这里要用一个 do-while 循环？
+            // 假设我们正要唤醒排在第一位的 next_thread，就在这极其微小的一瞬间，
+            // next_thread 的“超时闹钟”刚好响了，它自己从挂起链表里跑了！
+            // 此时 ready 就会失败。为了防止把钥匙交给一个“已经放弃等待”的线程，
+            // 架构师加了这个循环：如果你跑了，我就把钥匙给下一个人，直到成功给出去为止！
+            do
+            {
+                /* get the first suspended thread */
+                next_thread = RT_THREAD_LIST_NODE_ENTRY(mutex->parent.suspend_thread.next);
+
+                RT_ASSERT(rt_sched_thread_is_suspended(next_thread));
+
+                /* remove the thread from the suspended list of mutex */
+                rt_list_remove(&RT_THREAD_LIST_NODE(next_thread));
+
+                /* resume thread to ready queue */
+                if (rt_sched_thread_ready(next_thread) != RT_EOK)
+                {
+                    // 对方刚好超时跑了，跳过它，再试下一个人
+                    next_thread = RT_NULL;
+                }
+            } while (!next_thread && !rt_list_isempty(&mutex->parent.suspend_thread));
+```
+#### 锁的控制
+
+	`rt_mutex_control` 和 `rt_mutex_drop_thread` 和 `rt_mutex_setprioceiling` 和 `rt_mutex_getprioceiling`
+
+
+在阅读这部分代码时，最有价值的操作系统概念是：**优先级天花板协议 (Priority Ceiling Protocol, PCP)**。
+
+我们在前面的代码中学到的叫**优先级继承协议 (PIP)**。它们俩都是为了解决“优先级反转”的，但策略完全不同：
+
+1. **优先级继承 (PIP) —— “被动反应型”**
+    
+    - **做法**：低优先级线程 (Low) 拿到锁，它依然是 Low。**直到**高优先级线程 (High) 来敲门要锁时，系统才**被动地**把 Low 提拔到 High。
+        
+    - **缺点**：发生死锁的概率较高。如果 Low 拿了锁 A，又想去拿锁 B；而另一个中优先级线程拿了锁 B，想去拿锁 A。PIP 机制无法阻止这种交叉申请，会导致互相死锁。
+        
+2. **优先级天花板 (PCP) —— “主动防御型” (即 `setprioceiling` 函数的作用)**
+    
+    - **做法**：创建互斥量时，架构师评估系统里所有可能会用到这把锁的线程，找到其中优先级最高的那个人（比如优先级 10），把 10 设定为这把锁的“天花板 (Ceiling)”。
+        
+    - 当一个低优先级线程 (Low，优先级 30) 只要一拿到这把锁，**不需要等任何人来敲门**，系统瞬间、主动地把 Low 提拔到天花板级别 (10)。
+        
+    - **优点**：极致的安全性。Low 只要拿了锁，就成了全场级别最高的大哥，任何其他相关线程根本连抢占 CPU 去申请另一把锁的机会都没有！这在数学证明上（如速率单调分析 RMA）被证实可以**严格避免死锁和阻塞链**。
+
+
+
+```c
+// ====================================================================
+// 函数一：统一控制接口（空壳）
+// ====================================================================
+rt_err_t rt_mutex_control(rt_mutex_t mutex, int cmd, void *arg)
+{
+    // [架构师注释 1：接口占位符]
+    // 你会发现信号量有 control（可以重置状态），但互斥量目前不支持动态重置。
+    // 为什么还要写这个函数？为了“多态”！底层对象管理器可以用同一个函数指针类型
+    // 去调用所有 IPC 对象的 control，保持架构的一致性。
+    RT_UNUSED(mutex);
+    RT_UNUSED(cmd);
+    RT_UNUSED(arg);
+    return -RT_EINVAL; // 直接返回“无效参数”错误
+}
+
+// ====================================================================
+// 函数二：强行踢出排队线程
+// ====================================================================
+void rt_mutex_drop_thread(rt_mutex_t mutex, rt_thread_t thread)
+{
+    rt_uint8_t priority;
+    rt_bool_t need_update = RT_FALSE;
+    rt_sched_lock_level_t slvl;
+
+    RT_DEBUG_IN_THREAD_CONTEXT;
+    RT_ASSERT(mutex != RT_NULL);
+    RT_ASSERT(thread != RT_NULL);
+
+    rt_spin_lock(&(mutex->spinlock));
+    // 确保这个线程确确实实在等这把锁
+    RT_ASSERT(thread->pending_object == &mutex->parent.parent);
+
+    rt_sched_lock(&slvl);
+
+    /* detach from suspended list */
+    // [架构师注释 2：踢出候车室] 将目标线程从互斥量的排队链表中暴力拔除。
+    rt_list_remove(&RT_THREAD_LIST_NODE(thread));
+
+    // [架构师注释 3：收回特权评估]
+    // 极其严谨！如果这个被踢走的线程，恰好就是刚才把 Owner 优先级拔高的那个“贵人”
+    // （两者的当前优先级相等），那就说明 Owner 的特权可能需要被收回了！标记 need_update。
+    if (mutex->owner && rt_sched_thread_get_curr_prio(mutex->owner) == 
+                            rt_sched_thread_get_curr_prio(thread))
+    {
+        need_update = RT_TRUE;
+    }
+
+    // [架构师注释 4：刷新门外最高优先级记录]
+    if (!rt_list_isempty(&mutex->parent.suspend_thread))
+    {
+        struct rt_thread *th;
+        th = RT_THREAD_LIST_NODE_ENTRY(mutex->parent.suspend_thread.next);
+        mutex->priority = rt_sched_thread_get_curr_prio(th); // 记录剩下的人里的最高优先级
+    }
+    else
+    {
+        mutex->priority = 0xff; // 门外没人了
+    }
+
+    // [架构师注释 5：执行降级操作]
+    if (need_update)
+    {
+        // 重新评估 Owner 到底该降到多少级，并执行更新。
+        priority = _thread_get_mutex_priority(mutex->owner);
+        if (priority != rt_sched_thread_get_curr_prio(mutex->owner))
+        {
+            _thread_update_priority(mutex->owner, priority, RT_UNINTERRUPTIBLE);
+        }
+    }
+
+    rt_sched_unlock(slvl);
+    rt_spin_unlock(&(mutex->spinlock));
+}
+
+// ====================================================================
+// 函数三/四：设置/获取优先级天花板 (Priority Ceiling Protocol)
+// ====================================================================
+rt_uint8_t rt_mutex_setprioceiling(rt_mutex_t mutex, rt_uint8_t priority)
+{
+    rt_uint8_t ret_priority = 0xFF;
+    rt_uint8_t highest_prio;
+    rt_sched_lock_level_t slvl;
+
+    RT_DEBUG_IN_THREAD_CONTEXT;
+
+    if ((mutex) && (priority < RT_THREAD_PRIORITY_MAX))
+    {
+        rt_spin_lock(&(mutex->spinlock));
+        
+        // [架构师注释 6：保存旧值，设置新值]
+        ret_priority = mutex->ceiling_priority;
+        mutex->ceiling_priority = priority;
+        
+        // [架构师注释 7：立刻生效机制]
+        // 如果当前这把锁已经被某人拿在手里了，管理员突然调高了这把锁的“天花板等级”。
+        // 那么必须立刻重新评估当前 Owner 的优先级，看看要不要把它立刻提拔上去！
+        if (mutex->owner)
+        {
+            rt_sched_lock(&slvl);
+            highest_prio = _thread_get_mutex_priority(mutex->owner);
+            if (highest_prio != rt_sched_thread_get_curr_prio(mutex->owner))
+            {
+                _thread_update_priority(mutex->owner, highest_prio, RT_UNINTERRUPTIBLE);
+            }
+            rt_sched_unlock(slvl);
+        }
+        rt_spin_unlock(&(mutex->spinlock));
+    }
+    else
+    {
+        rt_set_errno(-RT_EINVAL);
+    }
+
+    return ret_priority; // 返回原来的天花板值，方便后续恢复
+}
+
+
+rt_uint8_t rt_mutex_getprioceiling(rt_mutex_t mutex)
+
+{
+
+    rt_uint8_t prio = 0xFF;
+
+  
+
+    /* parameter check */
+
+    RT_DEBUG_IN_THREAD_CONTEXT;
+
+    RT_ASSERT(mutex != RT_NULL);
+
+  
+
+    if (mutex)
+
+    {
+
+        rt_spin_lock(&(mutex->spinlock));
+
+        prio = mutex->ceiling_priority;
+
+        rt_spin_unlock(&(mutex->spinlock));
+
+    }
+
+  
+
+    return prio;
+
+}
+
+RTM_EXPORT(rt_mutex_getprioceiling);
+```
+
+
+- **面向对象设计的“接口隔离与统一”：** C 语言没有 C++ 的 `virtual` 虚函数。RT-Thread 通过提供 `rt_mutex_control` 这样的空函数，巧妙地维持了所有 `rt_ipc_object` 控制接口签名的一致性：`rt_err_t (*control)(rt_ipc_t ipc, int cmd, void *arg)`。这是一种极其优雅的 C 语言面向对象（OOP）妥协哲学。
+    
+- **状态联动（State Linkage）的严谨性：** 你看 `drop_thread` 仅仅是把线程从链表上摘下来这么简单吗？绝对不是。在复杂的 OS 内核中，**数据结构的改变必将引发系统状态的雪崩式计算**。拔掉一个节点，必须触发重新寻找最高优先级 -> 重新评估持有者优先级 -> 重新触发调度。任何一步的遗漏，都会在系统满负荷运转时演变成一场灾难性的崩溃。这就是底层开发最迷人，也最令人敬畏的地方。
+
+#### Example
+
+
+```c
+#include <rtthread.h>
+
+/* Pointer to the thread control block */
+static rt_thread_t tid1 = RT_NULL;
+static rt_thread_t tid2 = RT_NULL;
+static rt_thread_t tid3 = RT_NULL;
+static rt_mutex_t mutex = RT_NULL;
+
+
+#define THREAD_PRIORITY       10
+#define THREAD_STACK_SIZE     512
+#define THREAD_TIMESLICE    5
+
+/* Thread 1 Entry */
+static void thread1_entry(void *parameter)
+{
+    /* Let the low priority thread run first */
+    rt_thread_mdelay(100);
+
+    /* At this point, thread3 holds the mutex and thread2 is waiting to hold the mutex */
+
+    /* Check the priority level of thread2 and thread3 */
+    if (tid2->current_priority != tid3->current_priority)
+    {
+        /* The priority is different, the test fails */
+        rt_kprintf("the priority of thread2 is: %d\n", tid2->current_priority);
+        rt_kprintf("the priority of thread3 is: %d\n", tid3->current_priority);
+        rt_kprintf("test failed.\n");
+        return;
+    }
+    else
+    {
+        rt_kprintf("the priority of thread2 is: %d\n", tid2->current_priority);
+        rt_kprintf("the priority of thread3 is: %d\n", tid3->current_priority);
+        rt_kprintf("test OK.\n");
+    }
+}
+
+/* Thread 2 Entry */
+static void thread2_entry(void *parameter)
+{
+    rt_err_t result;
+
+    rt_kprintf("the priority of thread2 is: %d\n", tid2->current_priority);
+
+    /* Let the low-priority thread run first */
+    rt_thread_mdelay(50);
+
+    /*
+     * Trying to hold a mutex lock. At this point, thread 3 has the mutex lock, so the priority level of thread 3 should be raised
+     * to the same level of priority as thread 2
+     */
+    result = rt_mutex_take(mutex, RT_WAITING_FOREVER);
+
+    if (result == RT_EOK)
+    {
+        /* Release mutex lock */
+        rt_mutex_release(mutex);
+    }
+}
+
+/* Thread 3 Entry */
+static void thread3_entry(void *parameter)
+{
+    rt_tick_t tick;
+    rt_err_t result;
+
+    rt_kprintf("the priority of thread3 is: %d\n", tid3->current_priority);
+
+    result = rt_mutex_take(mutex, RT_WAITING_FOREVER);
+    if (result != RT_EOK)
+    {
+        rt_kprintf("thread3 take a mutex, failed.\n");
+    }
+
+    /* Operate a long cycle, 500ms */
+    tick = rt_tick_get();
+    while (rt_tick_get() - tick < (RT_TICK_PER_SECOND / 2)) ;
+
+    rt_mutex_release(mutex);
+}
+
+int pri_inversion(void)
+{
+    /* Created a mutex lock */
+    mutex = rt_mutex_create("mutex", RT_IPC_FLAG_FIFO);
+    if (mutex == RT_NULL)
+    {
+        rt_kprintf("create dynamic mutex failed.\n");
+        return -1;
+    }
+
+    /* Create thread 1*/
+    tid1 = rt_thread_create("thread1",
+                            thread1_entry,
+                            RT_NULL,
+                            THREAD_STACK_SIZE,
+                            THREAD_PRIORITY - 1, THREAD_TIMESLICE);
+    if (tid1 != RT_NULL)
+         rt_thread_startup(tid1);
+
+    /* Create thread 2 */
+    tid2 = rt_thread_create("thread2",
+                            thread2_entry,
+                            RT_NULL,
+                            THREAD_STACK_SIZE,
+                            THREAD_PRIORITY, THREAD_TIMESLICE);
+    if (tid2 != RT_NULL)
+        rt_thread_startup(tid2);
+
+    /* Create thread 3 */
+    tid3 = rt_thread_create("thread3",
+                            thread3_entry,
+                            RT_NULL,
+                            THREAD_STACK_SIZE,
+                            THREAD_PRIORITY + 1, THREAD_TIMESLICE);
+    if (tid3 != RT_NULL)
+        rt_thread_startup(tid3);
+
+    return 0;
+}
+
+/* Export to the msh command list */
+MSH_CMD_EXPORT(pri_inversion, prio_inversion sample);
+```
+
+
+
+#### EVENT
+
+
+#### 概念
+
+事件集主要用于线程之间的同步。与信号量不同，事件集可以实现一对多、多对多的同步关系。也就是说，线程与多个事件之间的关系可以这样设定：任何一个事件都能唤醒该线程；或者多个事件共同唤醒该线程以进行后续处理。同样地，多个线程也可以通过事件集来同步多个事件。这组多个事件可以用一个 32 位无符号整数变量来表示，该变量的每一位对应一个事件。线程通过“逻辑与”或“逻辑或”操作将一个或多个事件组合起来。其中，“逻辑或”操作对应的同步方式称为独立同步，即线程与其中一个事件同步；“逻辑与”操作对应的同步方式称为关联同步，即线程与多个事件同步。
+
+
+1. 事件仅与线程相关，且各事件之间相互独立：每个线程可以拥有 32 个事件标志，这些标志用 32 位无符号整数来表示，每一位对应一个事件。
+2. 该功能仅用于同步，不具备数据传输功能。
+3.  事件不会被重复发送，也就是说，即使该线程还没有来得及读取某个事件，也不会多次向该线程发送同一个事件。其效果相当于只发送一次而已。
+
+在 RT-Thread 中，每个线程都拥有一个包含三个属性的事件信息标签。这三个属性分别是：RT_EVENT_FLAG_AND（逻辑与）、RT_EVENT_FLAG_OR（逻辑或）以及 RT_EVENT_FLAG_CLEAR（清零标志）。当线程等待事件同步时，可以通过这 32 个事件标志以及该事件信息标签来判断当前接收到的事件是否满足同步条件。
+
+#### 初始化和删除的基本函数
+
+>默认不写动态的初始化因为大差不差
+
+`rt_event_init` 和 `rt_event_detach`
+
+这两个函数负责**静态事件集（Event）**的生命周期管理：`rt_event_init` 负责打造一块全新的“32位公告板”并挂载到系统；`rt_event_detach` 则负责在拆除公告板之前，把所有还在眼巴巴等公告的线程全部安全驱散，并注销对象。
+
+```c
+/**
+ * @brief    初始化一个静态事件集对象
+ */
+rt_err_t rt_event_init(rt_event_t event, const char *name, rt_uint8_t flag)
+{
+    /* parameter check */
+    RT_ASSERT(event != RT_NULL);
+    // 事件集同样支持 FIFO（先来先服务）和 PRIO（优先级插队）两种排队模式
+    RT_ASSERT((flag == RT_IPC_FLAG_FIFO) || (flag == RT_IPC_FLAG_PRIO));
+
+    /* initialize object */
+    // [架构师注释 1：基类初始化] 
+    // 登记系统户口，类型指定为 RT_Object_Class_Event。
+    rt_object_init(&(event->parent.parent), RT_Object_Class_Event, name);
+
+    /* set parent flag */
+    // 设置排队规则
+    event->parent.parent.flag = flag;
+
+    /* initialize ipc object */
+    // [架构师注释 2：IPC 父类初始化]
+    // 建立属于这个事件集的“候车室（挂起链表）”。
+    _ipc_object_init(&(event->parent));
+
+    /* initialize event */
+    // [架构师注释 3：事件集的灵魂变量！]
+    // event->set 是一个 32 位的无符号整数（在 32 位系统上）。
+    // 它的每一个 bit（位）都可以代表一个独立的事件。
+    // 初始化为 0，意味着此时公告板上没有任何事件发生。
+    event->set = 0;
+    
+    // 初始化自旋锁，保护这块公告板不被多核或中断并发写串线。
+    rt_spin_lock_init(&(event->spinlock));
+
+    return RT_EOK;
+}
+RTM_EXPORT(rt_event_init);
+
+
+/**
+ * @brief    脱离/销毁一个静态事件集对象
+ */
+rt_err_t rt_event_detach(rt_event_t event)
+{
+    rt_base_t level;
+
+    /* parameter check */
+    RT_ASSERT(event != RT_NULL);
+    RT_ASSERT(rt_object_get_type(&event->parent.parent) == RT_Object_Class_Event);
+    RT_ASSERT(rt_object_is_systemobject(&event->parent.parent));
+
+    // [架构师注释 4：关中断，锁公告板]
+    level = rt_spin_lock_irqsave(&(event->spinlock));
+    
+    /* resume all suspended thread */
+    // [架构师注释 5：暴力清场]
+    // 又是熟悉的配方！在拆除公告板之前，必须把所有还在候车室里等事件的线程全部叫醒。
+    // 并且塞给它们一个 RT_ERROR。这样它们醒来后检查返回值，就知道“不是事件等到了，而是公告板被砸了！”
+    rt_susp_list_resume_all(&(event->parent.suspend_thread), RT_ERROR);
+    
+    rt_spin_unlock_irqrestore(&(event->spinlock), level);
+
+    /* detach event object */
+    // [架构师注释 6：注销户口] 从系统的静态对象容器大链表中将其摘除。
+    rt_object_detach(&(event->parent.parent));
+
+    return RT_EOK;
+}
+RTM_EXPORT(rt_event_detach);
+```
+
+- **事件集的降维打击（多维逻辑）：** 看源码里的 `event->set = 0;`。这是一个 32 位的整型变量，意味着**它可以同时追踪 32 个不同的独立事件**（每一位代表一个事件，0为未发生，1为发生）。 借助于位运算，线程可以表达极其复杂的唤醒逻辑：
+    
+    - **逻辑与 (AND)**：我要等 bit 0 和 bit 2 **同时为 1** 才醒。
+        
+    - **逻辑或 (OR)**：只要 bit 1 或 bit 5 **任意一个为 1** 我就醒。
+        
+- **“广播”特性 (Broadcast)：** 信号量是一张门票，唤醒一个线程就消耗掉一张（`value--`）。而事件集是“公告板”。如果三个线程都在等 bit 0 变成 1，当某个中断把 bit 0 置为 1 时，这三个线程可以**同时被唤醒**！这在 RTOS 中被称为事件广播。
+
+
+#### 发送事件
+
+`rt_event_send`
+
+在使用该函数接口时，事件集对象的事件标志值由参数集所指定的事件标志来决定。随后，系统会检查那些横向等待该事件集对象的线程，看是否有线程满足与当前事件标志值相匹配的条件。如果有的话，就会唤醒该线程。下表介绍了该函数的输入参数和返回值：
+
+`rt_event_send` 是事件集的“大喇叭/广播站”**：它负责将一个或多个新事件（以位掩码的形式）贴到公告板上，然后挨个查房，把候车室里所有“条件已经满足”的等待线程**同时全部唤醒（即事件广播机制）。
+
+
+```c
+
+rt_err_t rt_event_send(rt_event_t event, rt_uint32_t set)
+{
+    struct rt_list_node *n;
+    struct rt_thread *thread;
+    rt_sched_lock_level_t slvl;
+    rt_base_t level;
+    rt_base_t status;
+    rt_bool_t need_schedule;
+    
+    // [架构师注释 1：延迟清除记录器]
+    // 这是一个极其关键的局部变量！它用来记录这轮广播结束后，有哪些位需要从公告板上擦除。
+    rt_uint32_t need_clear_set = 0;
+
+    /* parameter check */
+    RT_ASSERT(event != RT_NULL);
+    RT_ASSERT(rt_object_get_type(&event->parent.parent) == RT_Object_Class_Event);
+
+    if (set == 0)
+        return -RT_ERROR; // 发送一个空事件是没有意义的
+
+    need_schedule = RT_FALSE;
+
+    // [架构师注释 2：关中断上自旋锁] 保护公告板 (event->set) 的写入过程
+    level = rt_spin_lock_irqsave(&(event->spinlock));
+
+    /* set event */
+    // [架构师注释 3：贴上新公告]
+    // 使用位或 (|=) 操作。如果原来公告板上是 0x01 (Bit 0 为 1)，现在发送 0x04 (Bit 2 为 1)，
+    // 那么公告板就变成了 0x05 (Bit 0 和 Bit 2 都为 1)。老事件不会被覆盖！
+    event->set |= set;
+
+    RT_OBJECT_HOOK_CALL(rt_object_put_hook, (&(event->parent.parent)));
+
+    // [架构师注释 4：锁调度器，准备查房]
+    rt_sched_lock(&slvl);
+    
+    if (!rt_list_isempty(&event->parent.suspend_thread))
+    {
+        /* search thread list to resume thread */
+        // [架构师注释 5：遍历候车室里【所有】的线程（广播的核心）]
+        n = event->parent.suspend_thread.next;
+        while (n != &(event->parent.suspend_thread))
+        {
+            /* get thread */
+            thread = RT_THREAD_LIST_NODE_ENTRY(n);
+            status = -RT_ERROR;
+            
+            // ================== 【条件匹配核心逻辑】 ==================
+            // 分支 A：当前线程要求【逻辑与 (AND)】（必须所有指定的灯都亮，我才醒）
+            if (thread->event_info & RT_EVENT_FLAG_AND)
+            {
+                // 比如线程要求 0x05 (Bit 0 和 2)。
+                // 只有当 event->set 包含 0x05 时，(0x05 & 0x05) 才会等于 0x05。
+                if ((thread->event_set & event->set) == thread->event_set)
+                {
+                    status = RT_EOK; /* 条件满足！ */
+                }
+            }
+            // 分支 B：当前线程要求【逻辑或 (OR)】（只要指定的灯亮了任何一盏，我就醒）
+            else if (thread->event_info & RT_EVENT_FLAG_OR)
+            {
+                // 比如线程要求 0x05。只要 event->set 里有 Bit 0 或者 Bit 2 是 1，
+                // 位与的结果就 > 0，条件就成立！
+                if (thread->event_set & event->set)
+                {
+                    /* save the received event set */
+                    // [极客细节]：把实际触发了它的那些事件存进线程的 TCB 里，
+                    // 这样线程醒来后一看返回值，就知道具体是哪几盏灯把它亮醒的！
+                    thread->event_set = thread->event_set & event->set;
+                    status = RT_EOK; /* 条件满足！ */
+                }
+            }
+            else
+            {
+                // 逻辑标志错误，直接解锁报错返回
+                rt_sched_unlock(slvl);
+                rt_spin_unlock_irqrestore(&(event->spinlock), level);
+                return -RT_EINVAL;
+            }
+
+            /* move node to the next */
+            // [架构师注释 6：先取下一个节点，因为当前节点马上可能被拔掉！]
+            n = n->next;
+
+            // ================== 【执行唤醒与清除标记】 ==================
+            /* condition is satisfied, resume thread */
+            if (status == RT_EOK)
+            {
+                /* clear event */
+                // [架构师注释 7：累计需要清除的位]
+                // 如果这个被唤醒的线程要求“醒来后顺手把灯关掉 (RT_EVENT_FLAG_CLEAR)”
+                // 我们绝对不能在这里直接修改 event->set！
+                // 而是把要关的灯记在 need_clear_set 这个小本本上。
+                if (thread->event_info & RT_EVENT_FLAG_CLEAR)
+                    need_clear_set |= thread->event_set;
+
+                /* resume thread, and thread list breaks out */
+                // 把线程拔出挂起链表，塞入就绪队列
+                rt_sched_thread_ready(thread);
+                thread->error = RT_EOK;
+
+                /* need do a scheduling */
+                need_schedule = RT_TRUE;
+            }
+        } // end while
+
+        // ================== 【延迟清除大法】 ==================
+        // [架构师注释 8：秋后算账]
+        // 查房结束了，所有该醒的线程都被唤醒了。
+        // 现在，根据刚才小本本 (need_clear_set) 上的记录，把对应的灯统一关掉！
+        // &= ~ 操作就是经典的位图清零操作。
+        if (need_clear_set)
+        {
+            event->set &= ~need_clear_set;
+        }
+    }
+
+    rt_sched_unlock(slvl);
+    rt_spin_unlock_irqrestore(&(event->spinlock), level);
+
+    /* do a schedule */
+    // [架构师注释 9：如果刚才唤醒了人，现在退出临界区了，赶紧调度！]
+    if (need_schedule == RT_TRUE)
+        rt_schedule();
+
+    return RT_EOK;
+}
+RTM_EXPORT(rt_event_send);
+```
+
+**【架构师的解法：秋后算账】** 架构师的解法极其优雅：
+
+1. 遍历 A：条件满足？好的，A 你先去就绪队列。你想关灯？行，我先记在 `need_clear_set` 上，**但大屏幕上的灯我还留着亮。**
+    
+2. 遍历 B：一看大屏幕，灯还亮着！条件也满足！B 也进入就绪队列。
+    
+3. 等候车室里所有人都遍历完、全部公平地检查过一遍之后。内核才统一执行 `event->set &= ~need_clear_set;` 把灯关掉。 **这完美地实现了“状态的一致性读取”与“安全的事件广播”。**
+    
+
+---
+
+### 💡 **4. 思考与启发 (Takeaway)**
+
+- **`while` 循环里安全的链表节点删除法：** 你看源码里的 `n = n->next;` 被放在了真正唤醒线程（`rt_sched_thread_ready`）的前面。 这是因为，一旦执行 `rt_sched_thread_ready`，这个线程节点就会从当前的 `suspend_thread` 链表里被暴力拔出去！如果等唤醒完了再去 `n = n->next`，就会发生“野指针访问”导致系统 HardFault。“先找好退路，再拆桥”是处理链表遍历删除时的金科玉律。
+    
+- **按位操作的艺术 (Bitwise Operations)：** 这几句代码堪称 C 语言位操作的典范：
+    
+    - **合并事件**：`set |= event`
+        
+    - **清除事件**：`set &= ~event`
+        
+    - **提取交集**：`set = set & event` 在资源极度受限的单片机上，用几个时钟周期的位运算就完成了一堆布尔逻辑的判定，极其高效。
+
+
+
+#### 接收事件
+
+`rt_event_recv`
+
+`_rt_event_recv` 及其马甲函数是事件集的“公告板查阅与订阅处”：线程在此申明自己要等哪些事件（位掩码）、逻辑是什么（AND/OR）、醒后要不要擦除（CLEAR）。如果条件已满足则直接拿走结果；如果不满足，线程就会把这些“订阅要求”写在自己的脑门上，挂起休眠，等待发广播的人来叫醒它。
+```c
+static rt_err_t _rt_event_recv(rt_event_t   event,
+                               rt_uint32_t  set,       // 我要等哪些位？(比如 0x05)
+                               rt_uint8_t   option,    // 怎么等？(AND/OR, CLEAR)
+                               rt_int32_t   timeout,
+                               rt_uint32_t *recved,    // 传出参数：实际是哪些位把我叫醒的？
+                               int suspend_flag)
+{
+    struct rt_thread *thread;
+    rt_base_t level;
+    rt_base_t status;
+    rt_err_t ret;
+
+    /* parameter check */
+    RT_ASSERT(event != RT_NULL);
+    RT_ASSERT(rt_object_get_type(&event->parent.parent) == RT_Object_Class_Event);
+
+    // [架构师注释 1：上下文检查] 同样，可能引起挂起的函数绝对不能在中断中调用！
+    RT_DEBUG_SCHEDULER_AVAILABLE(RT_TRUE);
+
+    if (set == 0) return -RT_ERROR; // 你啥都不等，来这里干嘛？
+
+    status = -RT_ERROR;
+    thread = rt_thread_self();
+    thread->error = -RT_EINTR; // 预置打断错误
+
+    RT_OBJECT_HOOK_CALL(rt_object_trytake_hook, (&(event->parent.parent)));
+
+    // [架构师注释 2：锁住公告板，准备查阅]
+    level = rt_spin_lock_irqsave(&(event->spinlock));
+
+    // ====================================================================
+    // 场景一：【立刻命中 (Fast Path)】刚来查阅，发现公告板上的灯已经亮了！
+    // ====================================================================
+    if (option & RT_EVENT_FLAG_AND)
+    {
+        // 逻辑与：公告板上的灯 (event->set) 必须涵盖我要求的所有灯 (set)
+        if ((event->set & set) == set)
+            status = RT_EOK;
+    }
+    else if (option & RT_EVENT_FLAG_OR)
+    {
+        // 逻辑或：只要公告板上亮着的灯，和我要求的灯有交集 (非 0)
+        if (event->set & set)
+            status = RT_EOK;
+    }
+    else { RT_ASSERT(0); } // 必须指定一种逻辑
+
+    // 如果刚来看就发现条件满足了，爽！直接处理后走人，无需休眠。
+    if (status == RT_EOK)
+    {
+        thread->error = RT_EOK;
+
+        /* set received event */
+        // 将真正满足条件的交集位，通过指针还给用户
+        if (recved)
+            *recved = (event->set & set);
+
+        // [架构师注释 3：状态同步]
+        thread->event_set = (event->set & set);
+        thread->event_info = option;
+
+        /* received event */
+        // [架构师注释 4：立即关灯] 如果用户要求 CLEAR，并且条件达成了，顺手把这些灯关掉。
+        if (option & RT_EVENT_FLAG_CLEAR)
+            event->set &= ~set;
+    }
+    // ====================================================================
+    // 场景二：【条件不满足】没票，且 timeout == 0，不想等，立刻滚蛋
+    // ====================================================================
+    else if (timeout == 0)
+    {
+        thread->error = -RT_ETIMEOUT;
+        rt_spin_unlock_irqrestore(&(event->spinlock), level);
+        return -RT_ETIMEOUT;
+    }
+    // ====================================================================
+    // 场景三：【条件不满足，排队休眠】最核心的“委托判定”逻辑！
+    // ====================================================================
+    else
+    {
+        /* fill thread event info */
+        // [架构师注释 5：把“愿望清单”写在脑门上！]
+        // 既然我要睡了，谁来帮我盯着公告板？答案是：发广播（rt_event_send）的人！
+        // 那发广播的人怎么知道我要等什么条件？
+        // 绝招：把我要等的事件 (set) 和我的逻辑要求 (option) 保存在我自己的 TCB (线程控制块) 里！
+        thread->event_set  = set;
+        thread->event_info = option;
+
+        /* put thread to suspended thread list */
+        // 挂入事件集的等待链表
+        ret = rt_thread_suspend_to_list(thread, &(event->parent.suspend_thread),
+                                        event->parent.parent.flag, suspend_flag);
+        if (ret != RT_EOK)
+        {
+            rt_spin_unlock_irqrestore(&(event->spinlock), level);
+            return ret;
+        }
+
+        /* if there is a waiting timeout, active thread timer */
+        if (timeout > 0)
+        {
+            // 上闹钟...
+            rt_tick_t timeout_tick = timeout;
+            rt_timer_control(&(thread->thread_timer), RT_TIMER_CTRL_SET_TIME, &timeout_tick);
+            rt_timer_start(&(thread->thread_timer));
+        }
+
+        rt_spin_unlock_irqrestore(&(event->spinlock), level);
+
+        // [架构师注释 6：让出 CPU，陷入沉睡]
+        rt_schedule();
+
+        // ====================================================================
+        // 【时空折叠】被 rt_event_send 唤醒，或者超时醒来
+        // ====================================================================
+        
+        if (thread->error != RT_EOK)
+        {
+            // 查查是不是等超时了，或者被信号强杀了？如果是，直接返回报错。
+            return thread->error;
+        }
+
+        // [架构师注释 7：取回战利品]
+        // 如果 error 是 RT_EOK，说明我是被 rt_event_send 叫醒的！
+        level = rt_spin_lock_irqsave(&(event->spinlock));
+
+        /* set received event */
+        // 注意看这里！还记得上一课 send 里面的这句代码吗？
+        // thread->event_set = thread->event_set & event->set;
+        // 那个发广播的人，在叫醒我之前，已经把【实际亮起的灯】塞回到我的 event_set 里了！
+        // 我醒来后，什么都不用算，直接从自己的口袋里把答案拿出来就行了！
+        if (recved)
+            *recved = thread->event_set;
+    }
+
+    rt_spin_unlock_irqrestore(&(event->spinlock), level);
+    RT_OBJECT_HOOK_CALL(rt_object_take_hook, (&(event->parent.parent)));
+
+    return thread->error;
+}
+
+
+rt_err_t rt_event_recv(rt_event_t   event,
+
+                       rt_uint32_t  set,
+
+                       rt_uint8_t   option,
+
+                       rt_int32_t   timeout,
+
+                       rt_uint32_t *recved)
+
+{
+
+    return _rt_event_recv(event, set, option, timeout, recved, RT_UNINTERRUPTIBLE);
+
+}
+
+RTM_EXPORT(rt_event_recv);
+
+  
+
+rt_err_t rt_event_recv_interruptible(rt_event_t   event,
+
+                       rt_uint32_t  set,
+
+                       rt_uint8_t   option,
+
+                       rt_int32_t   timeout,
+
+                       rt_uint32_t *recved)
+
+{
+
+    return _rt_event_recv(event, set, option, timeout, recved, RT_INTERRUPTIBLE);
+
+}
+
+RTM_EXPORT(rt_event_recv_interruptible);
+
+  
+
+rt_err_t rt_event_recv_killable(rt_event_t   event,
+
+                       rt_uint32_t  set,
+
+                       rt_uint8_t   option,
+
+                       rt_int32_t   timeout,
+
+                       rt_uint32_t *recved)
+
+{
+
+    return _rt_event_recv(event, set, option, timeout, recved, RT_KILLABLE);
+
+}
+
+RTM_EXPORT(rt_event_recv_killable);
+
+```
+
+在这段代码中，展现了 RTOS 内核设计中一个极度优雅的思想：委托判定（Delegated Evaluation）与 **TCB 变量复用**。
+
+1. **为什么休眠中的线程不能自己去轮询公告板？** 在糟糕的设计中，线程可能会“睡一会儿 -> 醒来看一眼 -> 不满足继续睡”。这叫轮询（Polling），极大地浪费了 CPU 资源。 RTOS 的哲学是绝对的事件驱动。线程睡着了就跟死了一样，它**永远不会自己去判断条件是否成立**。
+    
+2. **委托判定的神来之笔：** 休眠前，线程把自己等待的条件塞进了 `thread->event_set`（存期望值）。 当别的线程调用 `rt_event_send` 修改公告板时，是那个**正在运行的、发公告的线程**顺手遍历了等待链表，代替休眠线程做了 AND/OR 的数学计算！ 一旦发公告的人发现条件满足了，它不仅把休眠线程扔进就绪队列，还顺手**修改了 `thread->event_set`**（把原来的期望值，直接覆盖替换成了实际触发的值）。
+    
+3. **醒来即收获：** 休眠线程被调度器重新拉起运行时（`rt_schedule()` 之后），它根本不需要再去查一遍 `event->set`，直接把 `thread->event_set` 掏出来就是答案。这种“沉睡前下达委托，醒来后直接提货”的机制，实现了多线程间极低开销的状态传递。
+    
+
+---
+
+### 💡 **4. 思考与启发 (Takeaway)**
+
+- **变量的生命周期与重载复用 (Variable Repurposing)：** 仔细看 `thread->event_set` 这个变量：
+    
+    - **睡觉前**，它代表：**“我想要什么”**（Request Mask）。
+        
+    - **醒来后**，它代表：**“我得到了什么”**（Result Mask）。 这种在不同生命周期阶段复用同一个结构体成员的做法，在资源极其紧张的单片机内核中非常常见。它省去了为“请求值”和“返回值”单独开辟内存的开销。
+        
+- **门面模式的极致应用：** 下方的 `rt_event_recv`、`rt_event_recv_interruptible` 等，和信号量/互斥量如出一辙，通过简单的 `suspend_flag` 包装，为 POSIX 兼容和异常处理提供了极其干净的 API 面板。这也是我们在设计系统库时必须学习的规范。
+    
+
+至此，关于事件集（Event）的“发送与延迟清除”和“接收与委托判定”两个核心模块，你已经完全洞悉了！它是应对多条件复合触发的最强利器。
+
+
+#### Example
+
+
+```c
+#include <rtthread.h>
+
+#define THREAD_PRIORITY      9
+#define THREAD_TIMESLICE     5
+
+#define EVENT_FLAG3 (1 << 3)
+#define EVENT_FLAG5 (1 << 5)
+
+/* Event control block */
+static struct rt_event event;
+
+ALIGN(RT_ALIGN_SIZE)
+static char thread1_stack[1024];
+static struct rt_thread thread1;
+
+/* Thread 1 entry function*/
+static void thread1_recv_event(void *param)
+{
+    rt_uint32_t e;
+
+    /* The first time the event is received, either event 3 or event 5 can trigger thread 1, clearing the event flag after receiving */
+    if (rt_event_recv(&event, (EVENT_FLAG3 | EVENT_FLAG5),
+                      RT_EVENT_FLAG_OR | RT_EVENT_FLAG_CLEAR,
+                      RT_WAITING_FOREVER, &e) == RT_EOK)
+    {
+        rt_kprintf("thread1: OR recv event 0x%x\n", e);
+    }
+
+    rt_kprintf("thread1: delay 1s to prepare the second event\n");
+    rt_thread_mdelay(1000);
+
+    /* The second time the event is received, both event 3 and event 5 can trigger thread 1, clearing the event flag after receiving */
+    if (rt_event_recv(&event, (EVENT_FLAG3 | EVENT_FLAG5),
+                      RT_EVENT_FLAG_AND | RT_EVENT_FLAG_CLEAR,
+                      RT_WAITING_FOREVER, &e) == RT_EOK)
+    {
+        rt_kprintf("thread1: AND recv event 0x%x\n", e);
+    }
+    rt_kprintf("thread1 leave.\n");
+}
+
+
+ALIGN(RT_ALIGN_SIZE)
+static char thread2_stack[1024];
+static struct rt_thread thread2;
+
+/* Thread 2 Entry */
+static void thread2_send_event(void *param)
+{
+    rt_kprintf("thread2: send event3\n");
+    rt_event_send(&event, EVENT_FLAG3);
+    rt_thread_mdelay(200);
+
+    rt_kprintf("thread2: send event5\n");
+    rt_event_send(&event, EVENT_FLAG5);
+    rt_thread_mdelay(200);
+
+    rt_kprintf("thread2: send event3\n");
+    rt_event_send(&event, EVENT_FLAG3);
+    rt_kprintf("thread2 leave.\n");
+}
+
+int event_sample(void)
+{
+    rt_err_t result;
+
+    /* Initialize event object */
+    result = rt_event_init(&event, "event", RT_IPC_FLAG_FIFO);
+    if (result != RT_EOK)
+    {
+        rt_kprintf("init event failed.\n");
+        return -1;
+    }
+
+    rt_thread_init(&thread1,
+                   "thread1",
+                   thread1_recv_event,
+                   RT_NULL,
+                   &thread1_stack[0],
+                   sizeof(thread1_stack),
+                   THREAD_PRIORITY - 1, THREAD_TIMESLICE);
+    rt_thread_startup(&thread1);
+
+    rt_thread_init(&thread2,
+                   "thread2",
+                   thread2_send_event,
+                   RT_NULL,
+                   &thread2_stack[0],
+                   sizeof(thread2_stack),
+                   THREAD_PRIORITY, THREAD_TIMESLICE);
+    rt_thread_startup(&thread2);
+
+    return 0;
+}
+
+/* Export to the msh command list */
+MSH_CMD_EXPORT(event_sample, event sample);
+```
