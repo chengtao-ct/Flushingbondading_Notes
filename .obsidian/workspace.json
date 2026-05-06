@@ -176,7 +176,7 @@
             }
           },
           {
-            "id": "eaaafcc51f5c012b",
+            "id": "de3dbfef38c09672",
             "type": "leaf",
             "state": {
               "type": "markdown",
@@ -198,9 +198,57 @@
               "icon": "lucide-file",
               "title": "4.MPU6050"
             }
+          },
+          {
+            "id": "f1f9dced487d38f2",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "工程实践/STM-F103/铁头山羊-平衡小车/标准库/5.PID.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "5.PID"
+            }
+          },
+          {
+            "id": "9e1f5b72fb80bf17",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "工程实践/芯片数据手册的阅读.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "芯片数据手册的阅读"
+            }
           }
         ],
-        "currentTab": 7
+        "currentTab": 8
       }
     ],
     "direction": "vertical"
@@ -389,24 +437,28 @@
   },
   "active": "3847ea54b0e476e0",
   "lastOpenFiles": [
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/3.编码器模块.md",
     "工程实践/STM-F103/铁头山羊-平衡小车/标准库/4.MPU6050.md",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/3.编码器模块/{582B1596-64E5-4F78-8119-172EA4400E94}.png",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/3.编码器模块/{584D243A-1B87-40CC-8096-6B8ABEFEF303}.png",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/5.PID.md",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/4.MPU6050/{D354AAB7-6F8C-481C-849F-1B2A87127876}.png",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/4.MPU6050/{457CE965-D1ED-4762-BBB8-7EDBEEB74CAA}.png",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/4.MPU6050/{5962ECBF-EE19-4572-88D1-718C617688E0}.png",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/4.MPU6050/{EC3A90A6-CE79-4103-A109-9ACB784EA5D6}.png",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/4.MPU6050/{913D7818-124A-4DD7-B3BC-E8DAE4E39A29}.png",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/4.MPU6050/{7D718ABC-6FCD-4B60-9625-13FA9E0AD627}.png",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/4.MPU6050/{32CE82EC-80A2-4AB8-B059-CBD38574A61B}.png",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/4.MPU6050/{D5D9818F-A55E-451A-8F63-22451BBB272B}.png",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/4.MPU6050/{37EA898B-B877-4D0E-9D94-86001B1E90D4}.png",
+    "工程实践/芯片数据手册的阅读.md",
+    "工程实践/STM-F103/铁头山羊-平衡小车/Lib/I2C.md",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/4.MPU6050/{98C5EAE9-6885-49D1-A361-82540AA76DDF}.png",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/4.MPU6050",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/3.编码器模块.md",
     "源码阅读/RT-thread源码阅读/9.IPC-Sync(同步).md",
     "工程实践/STM-F103/铁头山羊-平衡小车/标准库/2.电机模块.md",
     "工程实践/STM-M4/FL软件中断-设计.md",
     "工程实践/STM-M4/接口的书写.md",
     "工程实践/STM-M4/编码器-算法.md",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/3.编码器模块/{79BD016A-8487-486B-8A5B-30C1350811D1}.png",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/3.编码器模块/{44CFFEB9-0CDA-47AD-AD20-8E564AE85D71}.png",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/3.编码器模块/{61521A94-F04C-44FC-8F9E-E7F0B5CAE7E5}.png",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/3.编码器模块/c2795cdcbfb0d775cbf614a9052e5ca1.jpg",
     "嵌入式/芯片/开发板/STM32F103C8T6.md",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/3.编码器模块/a35317a3caedd5375c37e1f9594aa277.jpg",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/3.编码器模块/2cfd2142a52f9a5610bfb0214e01cb37.jpg",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/3.编码器模块/943d974d2f5d2483a1da6c07ca8530d4.jpg",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/3.编码器模块/{E5D26EF8-7745-43C5-A518-7E191F4C0027}.png",
     "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/3.编码器模块",
     "工程实践/STM-F103/铁头山羊-平衡小车/Lib/Button.md",
     "工程实践/STM-F103/铁头山羊-平衡小车/Lib",
@@ -423,7 +475,6 @@
     "工程实践/STM-F103/铁头山羊-平衡小车/assets/1.ADC-采样电源",
     "工程实践/STM-F103/铁头山羊-平衡小车/assets",
     "工程实践/STM-F103/铁头山羊-平衡小车",
-    "工程实践/STM-F103",
     "电气硬件-知识/电力电子/IGBT.md",
     "电气硬件-知识/电力电子/功率三极管.md",
     "电气硬件-知识/电力电子/晶闸管（SCR）以及衍生的TRIAC与GTO.md",
@@ -432,9 +483,6 @@
     "嵌入式/操作系统与内核/04_FreeRTOS/任务管理/优先级翻转.md",
     "嵌入式/操作系统与内核/04_FreeRTOS/锁与并发保护/锁与并发保护机制.md",
     "电气硬件-知识/电路基础(Circuit Theory)/第一部分：电路基础定理/5. More on KVL-KCL,Node Analysis,Supernodes.md",
-    "语言/C/工程/侵入式链表设计.md",
-    "语言/C/工程/整形转指针.md",
-    "嵌入式/操作系统与内核/04_FreeRTOS/同步与通信/信号量.md",
     "未命名 1.canvas",
     "未命名.canvas"
   ]
