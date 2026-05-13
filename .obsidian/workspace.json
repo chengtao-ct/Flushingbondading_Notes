@@ -8,174 +8,6 @@
         "type": "tabs",
         "children": [
           {
-            "id": "0c2f40268d7e7169",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "嵌入式/操作系统与内核/04_FreeRTOS/同步与通信/信号量.md",
-                "mode": "source",
-                "source": false,
-                "backlinks": true,
-                "backlinkOpts": {
-                  "collapseAll": false,
-                  "extraContext": false,
-                  "sortOrder": "alphabetical",
-                  "showSearch": false,
-                  "searchQuery": "",
-                  "backlinkCollapsed": false,
-                  "unlinkedCollapsed": true
-                }
-              },
-              "icon": "lucide-file",
-              "title": "信号量"
-            }
-          },
-          {
-            "id": "1bb4113afab1ab47",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "嵌入式/外设/TIM定时器基础概念.md",
-                "mode": "source",
-                "source": false,
-                "backlinks": true,
-                "backlinkOpts": {
-                  "collapseAll": false,
-                  "extraContext": false,
-                  "sortOrder": "alphabetical",
-                  "showSearch": false,
-                  "searchQuery": "",
-                  "backlinkCollapsed": false,
-                  "unlinkedCollapsed": true
-                }
-              },
-              "icon": "lucide-file",
-              "title": "TIM定时器基础概念"
-            }
-          },
-          {
-            "id": "5167c02ef45ecb2f",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "工程实践/STM-F103/铁头山羊-平衡小车/标准库/1.ADC-采样电源.md",
-                "mode": "source",
-                "source": false,
-                "backlinks": true,
-                "backlinkOpts": {
-                  "collapseAll": false,
-                  "extraContext": false,
-                  "sortOrder": "alphabetical",
-                  "showSearch": false,
-                  "searchQuery": "",
-                  "backlinkCollapsed": false,
-                  "unlinkedCollapsed": true
-                }
-              },
-              "icon": "lucide-file",
-              "title": "1.ADC-采样电源"
-            }
-          },
-          {
-            "id": "91ec3160d4a018fa",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "工程实践/STM-F103/铁头山羊-平衡小车/标准库/2.电机模块.md",
-                "mode": "source",
-                "source": false,
-                "backlinks": true,
-                "backlinkOpts": {
-                  "collapseAll": false,
-                  "extraContext": false,
-                  "sortOrder": "alphabetical",
-                  "showSearch": false,
-                  "searchQuery": "",
-                  "backlinkCollapsed": false,
-                  "unlinkedCollapsed": true
-                }
-              },
-              "icon": "lucide-file",
-              "title": "2.电机模块"
-            }
-          },
-          {
-            "id": "8849899f7826a49f",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "IPC-Sync.md",
-                "mode": "source",
-                "source": false,
-                "backlinks": true,
-                "backlinkOpts": {
-                  "collapseAll": false,
-                  "extraContext": false,
-                  "sortOrder": "alphabetical",
-                  "showSearch": false,
-                  "searchQuery": "",
-                  "backlinkCollapsed": false,
-                  "unlinkedCollapsed": true
-                }
-              },
-              "icon": "lucide-file",
-              "title": "IPC-Sync"
-            }
-          },
-          {
-            "id": "c8f2cf6ffb97f391",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "工程实践/STM-F103/铁头山羊-平衡小车/标准库/2.电机模块.md",
-                "mode": "source",
-                "source": false,
-                "backlinks": true,
-                "backlinkOpts": {
-                  "collapseAll": false,
-                  "extraContext": false,
-                  "sortOrder": "alphabetical",
-                  "showSearch": false,
-                  "searchQuery": "",
-                  "backlinkCollapsed": false,
-                  "unlinkedCollapsed": true
-                }
-              },
-              "icon": "lucide-file",
-              "title": "2.电机模块"
-            }
-          },
-          {
-            "id": "422bc8c6203d826e",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "工程实践/STM-F103/铁头山羊-平衡小车/标准库/3.编码器模块.md",
-                "mode": "source",
-                "source": false,
-                "backlinks": true,
-                "backlinkOpts": {
-                  "collapseAll": false,
-                  "extraContext": false,
-                  "sortOrder": "alphabetical",
-                  "showSearch": false,
-                  "searchQuery": "",
-                  "backlinkCollapsed": false,
-                  "unlinkedCollapsed": true
-                }
-              },
-              "icon": "lucide-file",
-              "title": "3.编码器模块"
-            }
-          },
-          {
             "id": "de3dbfef38c09672",
             "type": "leaf",
             "state": {
@@ -224,12 +56,12 @@
             }
           },
           {
-            "id": "55832c4865d081ff",
+            "id": "8b4f62b706cec34b",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "工程实践/STM-F103/铁头山羊-平衡小车/标准库/6.倒立摆.md",
+                "file": "工程实践/STM-F103/铁头山羊-平衡小车/标准库/1.ADC-采样电源.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -244,7 +76,7 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "6.倒立摆"
+              "title": "1.ADC-采样电源"
             }
           },
           {
@@ -253,7 +85,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "工程实践/芯片数据手册的阅读.md",
+                "file": "工程实践/STM-F103/铁头山羊-平衡小车/标准库/9.整体的工程思考和错误问题.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -268,11 +100,35 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "芯片数据手册的阅读"
+              "title": "9.整体的工程思考和错误问题"
+            }
+          },
+          {
+            "id": "301fde5916932896",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "工程实践/STM-F103/铁头山羊-平衡小车/标准库/3.编码器模块.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "3.编码器模块"
             }
           }
         ],
-        "currentTab": 9
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -459,54 +315,54 @@
       "copilot:Open Copilot Chat": false
     }
   },
-  "active": "55832c4865d081ff",
+  "active": "8b4f62b706cec34b",
   "lastOpenFiles": [
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/6.倒立摆/{0AC5C181-09B7-4407-B5B8-89C3C7300800}.png",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/6.倒立摆/{7E1FA2D8-444E-43B0-AAED-34AEDE3754A9}.png",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/6.倒立摆/{CA25700B-ECD5-432B-A209-C601C236EA57}.png",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/6.倒立摆/{822A76B5-3DCA-4EA3-B773-14EDC9B9D787}.png",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/6.倒立摆/{D1D970D6-2DFC-4E0B-A517-7A98CC640D8B}.png",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/6.倒立摆/{9A2CB80A-863B-4193-AFE5-904BCB9C6FDA}.png",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/6.倒立摆/{95A01FF2-4483-4AC4-B41D-0CE83F5A8910}.png",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/6.倒立摆/{E88DC3EA-359B-4A2A-AFA8-4EDF0F5BEC6F}.png",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/6.倒立摆/{AEA8B69D-D7A0-4A5F-9AD3-82B5DE8364D8}.png",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/6.倒立摆/{7EA4DBC3-3D2E-4592-9185-0E1B4885A2A3}.png",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/6.倒立摆/{2FD26436-9087-4E33-9D5B-5CB8270EE455}.png",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/6.倒立摆",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/5.PID模块.md",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/6.倒立摆.md",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/5.PID模块",
+    "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化/工程经验.md",
     "工程实践/STM-F103/铁头山羊-平衡小车/标准库/4.MPU6050.md",
-    "工程实践/芯片数据手册的阅读.md",
-    "工程实践/STM-F103/铁头山羊-平衡小车/Lib/I2C.md",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/4.MPU6050",
     "工程实践/STM-F103/铁头山羊-平衡小车/标准库/3.编码器模块.md",
-    "源码阅读/RT-thread源码阅读/9.IPC-Sync(同步).md",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/5.PID模块.md",
+    "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化/文件架构思路.md",
+    "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化/My_Lib.md",
+    "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化/STM32CubeMX.md",
+    "嵌入式/外设/TIM定时器基础概念.md",
+    "嵌入式/外设/DMA(直接存储器访问).md",
+    "嵌入式/操作库/STM-HAL库/TIM（定时器）.md",
+    "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化/assets/STM32CubeMX/{465B2DC8-6CEA-4037-B105-4D8EB3BB603E}.png",
+    "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化/assets/STM32CubeMX/{89E3DDE2-C1E3-43DD-B83A-E780BC530A20}.png",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/1.ADC-采样电源.md",
+    "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化/assets/STM32CubeMX",
+    "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化/assets",
+    "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化/assets/STM32CubeMX/file-20260512090035756.png",
+    "assets/STM32CubeMX",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/10.源码和复刻项目的对比.md",
+    "工程实践/STM-F103/铁头山羊-平衡小车/Lib/PID.md",
+    "语言/C/算法-C/PID算法-闭环控制.md",
+    "工程实践/STM-F103/铁头山羊-平衡小车/Lib/I2C.md",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/6.倒立摆.md",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/7.速度环.md",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/8.蓝牙控制模块.md",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/9.整体的工程思考和错误问题.md",
+    "算法/嵌入式实战/4.Ring Buffer 与掩码取模.md",
     "工程实践/STM-F103/铁头山羊-平衡小车/标准库/2.电机模块.md",
+    "工程实践/芯片数据手册的阅读.md",
+    "HAL库-优化.md",
+    "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/8.蓝牙控制模块/{656BB1CB-1B29-4AE4-86C4-239627DF8322}.png",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/8.蓝牙控制模块/{8F667B8C-5057-47A9-AE85-F3859DF765AB}.png",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/8.蓝牙控制模块/{F9EA5651-2344-477F-992A-C9B593063132}.png",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/8.蓝牙控制模块/{412A0927-8FDA-4B3F-A5A9-3882EE77553D}.png",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/8.蓝牙控制模块",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/7.速度环/{81722BDE-D0E7-4C14-B034-C46020DDD41B}.png",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/7.速度环/{F641F008-CAC5-498E-850F-67EFA76E4465}.png",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/7.速度环/{3CEE2613-04EC-4A8D-9060-0111C6EA4826}.png",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/7.速度环",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/6.倒立摆",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/5.PID模块",
+    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/4.MPU6050",
+    "源码阅读/RT-thread源码阅读/9.IPC-Sync(同步).md",
     "工程实践/STM-M4/FL软件中断-设计.md",
     "工程实践/STM-M4/接口的书写.md",
-    "工程实践/STM-M4/编码器-算法.md",
-    "嵌入式/芯片/开发板/STM32F103C8T6.md",
     "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/3.编码器模块",
-    "工程实践/STM-F103/铁头山羊-平衡小车/Lib/Button.md",
-    "工程实践/STM-F103/铁头山羊-平衡小车/Lib",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/2.电机模块",
-    "2.电机驱动模块.md",
-    "IPC-Sync.md",
-    "算法/嵌入式实战/生产者和消费者模型.md",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/1.ADC-采样电源.md",
-    "嵌入式/外设/TIM定时器基础概念.md",
-    "电气硬件-知识/电力电子/MOSFET.md",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/1.ADC-采样电源",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库",
-    "工程实践/STM-F103/铁头山羊-平衡小车/assets/1.ADC-采样电源",
-    "电气硬件-知识/电力电子/IGBT.md",
-    "电气硬件-知识/电力电子/功率三极管.md",
-    "电气硬件-知识/电力电子/晶闸管（SCR）以及衍生的TRIAC与GTO.md",
-    "电气硬件-知识/电力电子/功率二极管.md",
-    "电气硬件-知识/电力电子/电力电子总览.md",
-    "嵌入式/操作系统与内核/04_FreeRTOS/任务管理/优先级翻转.md",
     "未命名 1.canvas",
     "未命名.canvas"
   ]

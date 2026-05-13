@@ -639,8 +639,6 @@ $$ V_{Right} = V_{Target} - V_{Turn} $$
 
 ---
 
-**[End of Session]**
-特训结束。带上你的代码，去炸两个电机试试吧。实践出真知。
 
 
 
@@ -648,3 +646,5 @@ $$ V_{Right} = V_{Target} - V_{Turn} $$
 
 [PID Controlle](https://www.youtube.com/watch?v=sFqFrmMJ-sg&list=PLln3BHg93SQ_Ejn6godXbxromegXSMYOl)
 
+- 联系
+[PID](../../../工程实践/STM-F103/铁头山羊-平衡小车/Lib/PID.md)
