@@ -13,7 +13,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "工程实践/STM-F103/铁头山羊-平衡小车/标准库/4.MPU6050.md",
+                "file": "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化/文件架构思路.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -28,7 +28,31 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "4.MPU6050"
+              "title": "文件架构思路"
+            }
+          },
+          {
+            "id": "d125d0fb57b89ac8",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "源码阅读/RT-thread源码阅读/9.IPC-Sync-文档.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "9.IPC-Sync-文档"
             }
           },
           {
@@ -37,7 +61,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "工程实践/STM-F103/铁头山羊-平衡小车/标准库/5.PID模块.md",
+                "file": "源码阅读/RT-thread源码阅读/9.IPC-Sync(同步).md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -52,7 +76,7 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "5.PID模块"
+              "title": "9.IPC-Sync(同步)"
             }
           },
           {
@@ -61,7 +85,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "工程实践/STM-F103/铁头山羊-平衡小车/标准库/1.ADC-采样电源.md",
+                "file": "嵌入式/通信/协议层/TCP-IP 协议栈.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -76,31 +100,7 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "1.ADC-采样电源"
-            }
-          },
-          {
-            "id": "9e1f5b72fb80bf17",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "工程实践/STM-F103/铁头山羊-平衡小车/标准库/9.整体的工程思考和错误问题.md",
-                "mode": "source",
-                "source": false,
-                "backlinks": true,
-                "backlinkOpts": {
-                  "collapseAll": false,
-                  "extraContext": false,
-                  "sortOrder": "alphabetical",
-                  "showSearch": false,
-                  "searchQuery": "",
-                  "backlinkCollapsed": false,
-                  "unlinkedCollapsed": true
-                }
-              },
-              "icon": "lucide-file",
-              "title": "9.整体的工程思考和错误问题"
+              "title": "TCP-IP 协议栈"
             }
           },
           {
@@ -109,7 +109,7 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "工程实践/STM-F103/铁头山羊-平衡小车/标准库/3.编码器模块.md",
+                "file": "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化/STM32CubeMX.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -124,11 +124,11 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "3.编码器模块"
+              "title": "STM32CubeMX"
             }
           }
         ],
-        "currentTab": 2
+        "currentTab": 3
       }
     ],
     "direction": "vertical"
@@ -299,7 +299,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 349.5
+    "width": 349.5,
+    "collapsed": true
   },
   "left-ribbon": {
     "hiddenItems": {
@@ -315,37 +316,40 @@
       "copilot:Open Copilot Chat": false
     }
   },
-  "active": "8b4f62b706cec34b",
+  "active": "3847ea54b0e476e0",
   "lastOpenFiles": [
-    "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化/工程经验.md",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/4.MPU6050.md",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/3.编码器模块.md",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/5.PID模块.md",
-    "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化/文件架构思路.md",
-    "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化/My_Lib.md",
+    "工程实践/ESP32-C3",
+    "嵌入式/通信/协议层/LwIP 网络协议栈.md",
+    "嵌入式/通信/协议层/Modbus协议.md",
+    "嵌入式/通信/协议层/TCP-IP 协议栈.md",
+    "源码阅读/RT-thread源码阅读/9.IPC-Sync-文档.md",
+    "源码阅读/RT-thread源码阅读/10.IPC-Sync.md",
+    "源码阅读/RT-thread源码阅读/11.IPC-Common.md",
     "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化/STM32CubeMX.md",
-    "嵌入式/外设/TIM定时器基础概念.md",
-    "嵌入式/外设/DMA(直接存储器访问).md",
-    "嵌入式/操作库/STM-HAL库/TIM（定时器）.md",
+    "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化/文件架构思路.md",
+    "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化/面试提问.md",
+    "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化/工程经验.md",
+    "语言/栈溢出检测机制.md",
+    "语言/面向切面编程.md",
+    "语言/防御性编程.md",
+    "了解一个板子的基本流程.md",
+    "日志信息.md",
+    "源码阅读/RT-thread源码阅读/8.Interrupt.md",
+    "嵌入式/中断/RT-thread中断机制.md",
+    "源码阅读/RT-thread源码阅读/6.Scheduler-上层调度.md",
+    "源码阅读/RT-thread源码阅读/7.Timer.md",
+    "源码阅读/RT-thread源码阅读/预览与计划.md",
+    "源码阅读/RT-thread源码阅读/5.Scheduler(调度器)-单核和底层驱动.md",
+    "源码阅读/RT-thread源码阅读/4.(Thread)线程的创建和理解.md",
+    "源码阅读/4.29阅读想法.md",
+    "工程实践/STM-F103/铁头山羊-平衡小车/Lib/PID.md",
+    "工程实践/STM-F103/铁头山羊-平衡小车/Lib/I2C.md",
     "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化/assets/STM32CubeMX/{465B2DC8-6CEA-4037-B105-4D8EB3BB603E}.png",
     "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化/assets/STM32CubeMX/{89E3DDE2-C1E3-43DD-B83A-E780BC530A20}.png",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/1.ADC-采样电源.md",
     "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化/assets/STM32CubeMX",
     "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化/assets",
     "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化/assets/STM32CubeMX/file-20260512090035756.png",
     "assets/STM32CubeMX",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/10.源码和复刻项目的对比.md",
-    "工程实践/STM-F103/铁头山羊-平衡小车/Lib/PID.md",
-    "语言/C/算法-C/PID算法-闭环控制.md",
-    "工程实践/STM-F103/铁头山羊-平衡小车/Lib/I2C.md",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/6.倒立摆.md",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/7.速度环.md",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/8.蓝牙控制模块.md",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/9.整体的工程思考和错误问题.md",
-    "算法/嵌入式实战/4.Ring Buffer 与掩码取模.md",
-    "工程实践/STM-F103/铁头山羊-平衡小车/标准库/2.电机模块.md",
-    "工程实践/芯片数据手册的阅读.md",
-    "HAL库-优化.md",
     "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化",
     "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/8.蓝牙控制模块/{656BB1CB-1B29-4AE4-86C4-239627DF8322}.png",
     "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/8.蓝牙控制模块/{8F667B8C-5057-47A9-AE85-F3859DF765AB}.png",
@@ -359,9 +363,6 @@
     "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/6.倒立摆",
     "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/5.PID模块",
     "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/4.MPU6050",
-    "源码阅读/RT-thread源码阅读/9.IPC-Sync(同步).md",
-    "工程实践/STM-M4/FL软件中断-设计.md",
-    "工程实践/STM-M4/接口的书写.md",
     "工程实践/STM-F103/铁头山羊-平衡小车/标准库/assets/3.编码器模块",
     "未命名 1.canvas",
     "未命名.canvas"
