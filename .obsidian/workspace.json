@@ -8,12 +8,12 @@
         "type": "tabs",
         "children": [
           {
-            "id": "de3dbfef38c09672",
+            "id": "4cab69b6804bda85",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "工程实践/STM-F103/铁头山羊-平衡小车/HAL库-优化/文件架构思路.md",
+                "file": "嵌入式/芯片/开发板/CH552G.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -28,16 +28,16 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "文件架构思路"
+              "title": "CH552G"
             }
           },
           {
-            "id": "13424933092c1647",
+            "id": "d4d77aca0d02710c",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "物联网/IOT应用/OTA升级.md",
+                "file": "工程实践/STM-M4/RT-thread项目实战/工程实战：第一阶段.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -52,59 +52,11 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "OTA升级"
-            }
-          },
-          {
-            "id": "99881e2de87bf787",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "工程实践/ESP32-C3/MQTT服务器-物联网/Task1-本地电脑控制LED的反转.md",
-                "mode": "source",
-                "source": false,
-                "backlinks": true,
-                "backlinkOpts": {
-                  "collapseAll": false,
-                  "extraContext": false,
-                  "sortOrder": "alphabetical",
-                  "showSearch": false,
-                  "searchQuery": "",
-                  "backlinkCollapsed": false,
-                  "unlinkedCollapsed": true
-                }
-              },
-              "icon": "lucide-file",
-              "title": "Task1-本地电脑控制LED的反转"
-            }
-          },
-          {
-            "id": "08bb75eda18ded2e",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "源码阅读/RT-thread源码阅读-v2/06-IPC.md",
-                "mode": "source",
-                "source": false,
-                "backlinks": true,
-                "backlinkOpts": {
-                  "collapseAll": false,
-                  "extraContext": false,
-                  "sortOrder": "alphabetical",
-                  "showSearch": false,
-                  "searchQuery": "",
-                  "backlinkCollapsed": false,
-                  "unlinkedCollapsed": true
-                }
-              },
-              "icon": "lucide-file",
-              "title": "06-IPC"
+              "title": "工程实战：第一阶段"
             }
           }
         ],
-        "currentTab": 2
+        "currentTab": 1
       }
     ],
     "direction": "vertical"
@@ -136,7 +88,7 @@
             "state": {
               "type": "search",
               "state": {
-                "query": "tag:#define",
+                "query": " ",
                 "matchingCase": false,
                 "explainSearch": false,
                 "collapseAll": false,
@@ -161,7 +113,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 262.5
+    "width": 255.5
   },
   "right": {
     "id": "dd2d87647441e510",
@@ -292,54 +244,54 @@
       "copilot:Open Copilot Chat": false
     }
   },
-  "active": "99881e2de87bf787",
+  "active": "d4d77aca0d02710c",
   "lastOpenFiles": [
-    "物联网/IOT应用/IOT连接.md",
-    "物联网/IOT应用/MQTT协议.md",
-    "物联网/IOT应用/OTA升级.md",
-    "工程实践/ESP32-C3/MQTT服务器-物联网/Task1-本地电脑控制LED的反转.md",
-    "嵌入式/操作系统与内核/04_FreeRTOS/内存管理/中断推迟处理.md",
-    "嵌入式/操作系统与内核/04_FreeRTOS/内存管理/隐性开销-FPU与RunTimeStats.md",
-    "嵌入式/操作系统与内核/04_FreeRTOS/内存管理/异构内存与任意堆.md",
-    "嵌入式/操作系统与内核/04_FreeRTOS/内存管理/内存管理_概览.md",
-    "嵌入式/操作系统与内核/01_通用理论/IPC-进程间通信.md",
-    "嵌入式/操作系统与内核/01_通用理论/Bootloader.md",
+    "嵌入式/芯片/开发板/ESP32-WROOM-32.md",
+    "嵌入式/芯片/开发板/ESP32-S3-USB-OTG_SUB.md",
+    "嵌入式/芯片/开发板/ESP32-D0WDQ6.md",
+    "嵌入式/芯片/开发板/STM32F103C8T6.md",
+    "嵌入式/芯片/开发板/STM32F407ZGT6.md",
+    "工程实践/STM-M4/RT-thread项目实战/工程实战：第一阶段.md",
+    "嵌入式/芯片/开发板/CH552G.md",
+    "工程实践/5.26需求工程：第一阶段/CH552G.md",
+    "嵌入式/内存/内存_概览.md",
+    "嵌入式/内存/ESP32/ESP32的系统存储.md",
+    "嵌入式/芯片/专用处理能力/DSP.md",
     "嵌入式/操作系统与内核/01_通用理论/进程调度算法.md",
     "嵌入式/操作系统与内核/01_通用理论/进程-线程-协程.md",
     "嵌入式/操作系统与内核/01_通用理论/互斥与同步.md",
-    "物联网/IOT应用/TLS加密协议.md",
-    "物联网/IOT应用/WIFI.md",
-    "ESP32.md",
-    "源码阅读/RT-thread源码阅读-v2/06-IPC.md",
-    "语言/JSON.md",
-    "语言/C/函数/嵌入式常见函数.md",
-    "工程实践/ESP32-C3/MQTT服务器-物联网",
-    "嵌入式/通信/协议层/HTTP协议.md",
-    "嵌入式/通信/协议层/TCP-IP 协议栈.md",
-    "嵌入式/通信/协议层/Modbus协议.md",
-    "嵌入式/通信/协议层/LwIP 网络协议栈.md",
-    "嵌入式/通信/协议层/TLS协议.md",
-    "嵌入式/内存/ESP32/ESP32的系统存储.md",
-    "物联网/FatFS 文件系统.md",
+    "嵌入式/中断/不同架构的中断机制对比.md",
+    "嵌入式/中断/向量表的基础理解.md",
+    "嵌入式/中断/栈与上下文.md",
+    "嵌入式/中断/中断的基础理解.md",
+    "嵌入式/中断/中断在RTOS中的角色.md",
+    "嵌入式/中断/中断在Linux中的角色.md",
+    "嵌入式/中断/中断实战与踩坑.md",
+    "语言/栈溢出检测机制.md",
+    "语言/面向切面编程.md",
+    "语言/防御性编程.md",
+    "嵌入式/操作系统与内核/04_FreeRTOS/内存管理/异构内存与任意堆.md",
+    "嵌入式/操作系统与内核/04_FreeRTOS/内存管理/内存管理_概览.md",
+    "工程实践/STM-M4/RT-thread项目实战",
+    "嵌入式/操作库/Free-RTOS库/assets/铁头山羊-FreeRtos",
+    "嵌入式/操作库/Free-RTOS库/assets",
+    "嵌入式/操作库/Free-RTOS库/assets/铁头山羊-FreeRtos/file-20260606113832742.png",
+    "assets/铁头山羊-FreeRtos",
+    "嵌入式/操作库/Free-RTOS库/assets/铁头山羊-FreeRtos/file-20260606113832754.png",
+    "assets/铁头山羊",
+    "嵌入式/芯片/开发板/assets/ESP32-S3-USB-OTG_SUB/{E559F186-79C6-445D-9A4A-CE6C4CD22768}.png",
+    "嵌入式/芯片/开发板/assets/ESP32-S3-USB-OTG_SUB",
+    "嵌入式/芯片/开发板/assets",
+    "物联网/图像和摄像/assets/UVC/{66FC4500-B0D1-462B-818A-092D13BD39C9}.png",
+    "物联网/图像和摄像/assets/UVC",
+    "物联网/图像和摄像/assets",
+    "物联网/文件系统",
     "物联网/IOT应用/assets/MQTT协议/{2DD6AA6C-96B1-491C-BC83-FC00F4A17185}.png",
     "物联网/IOT应用/assets/MQTT协议/{B12A5059-DC4A-4231-BD31-0C7F7E92D5CA}.png",
     "物联网/IOT应用/assets/MQTT协议/{B3C756A4-6DDB-4A62-A56E-309935C41C0C}.png",
     "物联网/IOT应用/assets/MQTT协议/{E62AF7DC-E1E9-42F8-9565-361FAFE1F117}.png",
-    "物联网/IOT应用/assets/MQTT协议",
     "物联网/IOT应用/assets/WIFI/{80F4DE64-6CFE-4D31-AB95-1E0BE0BB72B9}.png",
     "物联网/IOT应用/assets/WIFI/{FF6EAF17-2FD5-4387-9CE8-9C96A25B1BA1}.png",
-    "物联网/IOT应用/assets/WIFI/{B37F3791-4A56-4718-81AC-1E3A78181682}.png",
-    "物联网/IOT应用/assets/WIFI/{0631073E-07AB-4923-A838-D03C2BC91D96}.png",
-    "物联网/IOT应用/assets/WIFI",
-    "物联网/IOT应用/assets",
-    "物联网/IOT应用",
-    "嵌入式/内存/ESP32/assets/ESP32的系统存储/{FB6E00F4-7DE2-4A14-97F9-4C230B970F23}.png",
-    "嵌入式/内存/ESP32/assets/ESP32的系统存储/{36459A7A-2970-4FD2-82BA-084627191271}.png",
-    "嵌入式/内存/ESP32/assets/ESP32的系统存储",
-    "嵌入式/内存/ESP32的系统存储/assets/分区表",
-    "嵌入式/内存/ESP32/assets",
-    "嵌入式/内存/ESP32",
-    "assets/ESP-IDF的库",
     "未命名 1.canvas",
     "未命名.canvas"
   ]

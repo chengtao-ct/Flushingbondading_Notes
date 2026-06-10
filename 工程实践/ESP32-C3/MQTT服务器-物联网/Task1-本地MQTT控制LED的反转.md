@@ -1,4 +1,4 @@
-﻿---
+---
 aliases:
   - 本地 MQTT
   - ESP32 MQTT LED
@@ -16,9 +16,9 @@ tags:
 status: project-note
 date: 2026-05-25
 related:
-  - "[[MQTT协议]]"
-  - "[[WIFI]]"
-  - "[[IOT连接]]"
+  - "[[../../../物联网/IOT应用/MQTT协议]]"
+  - "[[../../../物联网/IOT应用/WIFI]]"
+  - "[[../../../物联网/IOT应用/IOT连接]]"
 ---
 
 # Task1：本地电脑控制 LED 的反转
