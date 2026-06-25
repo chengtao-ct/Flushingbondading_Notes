@@ -8,12 +8,12 @@
         "type": "tabs",
         "children": [
           {
-            "id": "4cab69b6804bda85",
+            "id": "caeb5b79225e2c02",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "嵌入式/芯片/开发板/CH552G.md",
+                "file": "工程实践/5.26-project/5.26需求工程第二阶段/AI部署认知基础.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -28,16 +28,16 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "CH552G"
+              "title": "AI部署认知基础"
             }
           },
           {
-            "id": "d4d77aca0d02710c",
+            "id": "a5c0c5d720030db1",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "工程实践/STM-M4/RT-thread项目实战/工程实战：第一阶段.md",
+                "file": "工程实践/5.26-project/5.26需求工程第二阶段/AI部署认知基础.md",
                 "mode": "source",
                 "source": false,
                 "backlinks": true,
@@ -52,11 +52,59 @@
                 }
               },
               "icon": "lucide-file",
-              "title": "工程实战：第一阶段"
+              "title": "AI部署认知基础"
+            }
+          },
+          {
+            "id": "08d2befc95382d0d",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "调试烧录-知识/Cmake-STM/Cortex-M4 核心寄存器与调用栈.md",
+                "mode": "preview",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "Cortex-M4 核心寄存器与调用栈"
+            }
+          },
+          {
+            "id": "8eb23a2fdc8e7954",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "语言/C/工程/显示调用和隐式调用.md",
+                "mode": "source",
+                "source": false,
+                "backlinks": true,
+                "backlinkOpts": {
+                  "collapseAll": false,
+                  "extraContext": false,
+                  "sortOrder": "alphabetical",
+                  "showSearch": false,
+                  "searchQuery": "",
+                  "backlinkCollapsed": false,
+                  "unlinkedCollapsed": true
+                }
+              },
+              "icon": "lucide-file",
+              "title": "显示调用和隐式调用"
             }
           }
         ],
-        "currentTab": 1
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -244,48 +292,48 @@
       "copilot:Open Copilot Chat": false
     }
   },
-  "active": "d4d77aca0d02710c",
+  "active": "3847ea54b0e476e0",
   "lastOpenFiles": [
-    "嵌入式/芯片/开发板/ESP32-WROOM-32.md",
-    "嵌入式/芯片/开发板/ESP32-S3-USB-OTG_SUB.md",
-    "嵌入式/芯片/开发板/ESP32-D0WDQ6.md",
-    "嵌入式/芯片/开发板/STM32F103C8T6.md",
-    "嵌入式/芯片/开发板/STM32F407ZGT6.md",
-    "工程实践/STM-M4/RT-thread项目实战/工程实战：第一阶段.md",
-    "嵌入式/芯片/开发板/CH552G.md",
-    "工程实践/5.26需求工程：第一阶段/CH552G.md",
-    "嵌入式/内存/内存_概览.md",
-    "嵌入式/内存/ESP32/ESP32的系统存储.md",
-    "嵌入式/芯片/专用处理能力/DSP.md",
+    "调试烧录-知识/Cmake-STM/调试全景数据流.md",
+    "调试烧录-知识/配置文件链路.md",
+    "调试烧录-知识/文件格式.md",
+    "调试烧录-知识/CMake.md",
+    "物联网/IOT应用/WIFI.md",
+    "物联网/IOT应用/TLS加密协议.md",
+    "物联网/IOT应用/OTA升级.md",
+    "物联网/IOT应用/MQTT协议.md",
+    "物联网/IOT应用/IOT连接.md",
+    "物联网/文件系统/FatFS 文件系统.md",
+    "物联网/图形页面GUI/LVGL.md",
+    "物联网/图像和摄像/视频流与压缩.md",
+    "物联网/图像和摄像/摄像头硬件接口.md",
+    "语言/JSON.md",
+    "语言/面向切面编程.md",
+    "语言/防御性编程.md",
+    "嵌入式/操作系统与内核/03_裸机架构模式/环形缓冲区.md",
+    "嵌入式/操作系统与内核/02_多核与底层机制/自旋锁机制.md",
+    "嵌入式/操作系统与内核/02_多核与底层机制/IO映射.md",
+    "嵌入式/操作系统与内核/02_多核与底层机制/实时系统内存管理原理.md",
+    "嵌入式/操作系统与内核/02_多核与底层机制/多核并发与Cache一致性.md",
+    "嵌入式/操作系统与内核/02_多核与底层机制/核间中断-IPI.md",
     "嵌入式/操作系统与内核/01_通用理论/进程调度算法.md",
     "嵌入式/操作系统与内核/01_通用理论/进程-线程-协程.md",
     "嵌入式/操作系统与内核/01_通用理论/互斥与同步.md",
-    "嵌入式/中断/不同架构的中断机制对比.md",
-    "嵌入式/中断/向量表的基础理解.md",
-    "嵌入式/中断/栈与上下文.md",
-    "嵌入式/中断/中断的基础理解.md",
-    "嵌入式/中断/中断在RTOS中的角色.md",
-    "嵌入式/中断/中断在Linux中的角色.md",
-    "嵌入式/中断/中断实战与踩坑.md",
-    "语言/栈溢出检测机制.md",
-    "语言/面向切面编程.md",
-    "语言/防御性编程.md",
-    "嵌入式/操作系统与内核/04_FreeRTOS/内存管理/异构内存与任意堆.md",
-    "嵌入式/操作系统与内核/04_FreeRTOS/内存管理/内存管理_概览.md",
+    "嵌入式/内存/MMU(内存管理单元).md",
+    "工程实践/5.26-project",
+    "工程实践/5.26-project/5.26需求工程第二阶段",
+    "工程实践/STM-M4/RT-thread项目实战/第三阶段",
+    "ai-engineering-from-scratch-main/math-fucntions",
+    "未命名 1",
+    "ai-engineering-from-scratch-main",
+    "AI-study/线代",
     "工程实践/STM-M4/RT-thread项目实战",
     "嵌入式/操作库/Free-RTOS库/assets/铁头山羊-FreeRtos",
     "嵌入式/操作库/Free-RTOS库/assets",
     "嵌入式/操作库/Free-RTOS库/assets/铁头山羊-FreeRtos/file-20260606113832742.png",
-    "assets/铁头山羊-FreeRtos",
     "嵌入式/操作库/Free-RTOS库/assets/铁头山羊-FreeRtos/file-20260606113832754.png",
-    "assets/铁头山羊",
     "嵌入式/芯片/开发板/assets/ESP32-S3-USB-OTG_SUB/{E559F186-79C6-445D-9A4A-CE6C4CD22768}.png",
-    "嵌入式/芯片/开发板/assets/ESP32-S3-USB-OTG_SUB",
-    "嵌入式/芯片/开发板/assets",
     "物联网/图像和摄像/assets/UVC/{66FC4500-B0D1-462B-818A-092D13BD39C9}.png",
-    "物联网/图像和摄像/assets/UVC",
-    "物联网/图像和摄像/assets",
-    "物联网/文件系统",
     "物联网/IOT应用/assets/MQTT协议/{2DD6AA6C-96B1-491C-BC83-FC00F4A17185}.png",
     "物联网/IOT应用/assets/MQTT协议/{B12A5059-DC4A-4231-BD31-0C7F7E92D5CA}.png",
     "物联网/IOT应用/assets/MQTT协议/{B3C756A4-6DDB-4A62-A56E-309935C41C0C}.png",
