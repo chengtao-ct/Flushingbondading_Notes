@@ -601,54 +601,10 @@ Smartcar_V1/
 
 **一句话总结**：CMake 是**构建系统的翻译官**，CMakeLists.txt 是你写给它的**构建说明书**。你的三层架构设计（顶层入口 + CubeMX 层 + App 层）是嵌入式项目的最佳实践——让 CubeMX 生成的代码和业务代码各司其职，互不干扰。
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ---
 
+## 🔗 知识延伸
 
-1. CMake 三层职责固定：  
-    [Smartcar_V1/CMakeLists.txt](/c:/Users/tao93/Desktop/Car/Smartcar_V1/CMakeLists.txt:1)：项目总入口，长期手工维护。  
-    [Smartcar_V1/cmake/stm32cubemx/CMakeLists.txt](/c:/Users/tao93/Desktop/Car/Smartcar_V1/cmake/stm32cubemx/CMakeLists.txt:1)：CubeMX 生成层，只允许生成器覆盖。  
-    [Smartcar_V1/App/CMakeLists.txt](/c:/Users/tao93/Desktop/Car/Smartcar_V1/App/CMakeLists.txt:1)：业务模块源文件/头文件入口，手工维护。
-
----
-
-## CMakeLists 编写规范（分层扩展策略）
-
-1. 禁止手改 Cube 生成层  
-    不要手动编辑 [cmake/stm32cubemx/CMakeLists.txt](/c:/Users/tao93/Desktop/Car/Smartcar_V1/cmake/stm32cubemx/CMakeLists.txt:1) 的业务逻辑。
-    
-2. 所有业务模块只在 App 层维护  
-    只改 [App/CMakeLists.txt](/c:/Users/tao93/Desktop/Car/Smartcar_V1/App/CMakeLists.txt:1) 的 APP_SOURCES 和 include 路径。  
-    坚持显式列出源文件，不用 GLOB。
-    
-3. 顶层只做结构性动作  
-    add_subdirectory(cmake/stm32cubemx) + add_subdirectory(App)，避免把模块源文件直接堆到顶层。
-    
-4. 变更模块的标准动作  
-    新增 .c/.h 后只做两件事：  
-    更新 APP_SOURCES；更新 target_include_directories。  
-    然后重新 Configure + Build 验证。
-
---
+- ⬆️ **上位知识**：[[_MOC-开发流水线总览]]、[[嵌入式开发工具链]]
+- ➡️ **平级关联**：[[配置文件链路]]、[[文件格式]]
+- ⬇️ **下位知识**：toolchain.cmake 编写规范、CMakePresets.json 详解

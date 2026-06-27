@@ -1,5 +1,18 @@
-sdkconfig 文件在 ESP32 烧录中的作用
-一、它到底是什么？
+---
+aliases:
+  - Kconfig
+  - ESP-IDF 配置
+tags:
+  - 调试/知识体系
+  - 烧录/ESP32
+  - ESP32
+date: 2026-04-13
+status: 🌿草稿
+---
+
+# sdkconfig：ESP-IDF 构建配置核心
+
+## 一、它到底是什么？
 sdkconfig 是 ESP-IDF 构建系统的核心配置文件，本质是一个 键值对（Kconfig）文本文件，决定了：
 你的固件到底编译了什么功能、占多大空间、跑在什么参数上
 它 不直接参与烧录，但 决定了烧录进芯片的固件长什么样。
